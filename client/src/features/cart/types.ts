@@ -10,3 +10,9 @@ export interface CartItem {
   product: Product;
   quantity: number;
 }
+
+export type CartFetchState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; items: CartItem[] }
+  | { status: "error"; message: string };
