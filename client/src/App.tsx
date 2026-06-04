@@ -3,12 +3,10 @@ import { colors, fonts } from "./shared/styles/tokens";
 import { GlobalStyles } from "./shared/styles/GlobalStyles";
 import { CartItemRow } from "./features/cart/components/CartItemRow";
 import { OrderSummary } from "./features/cart/components/OrderSummary";
-import {
-  FREE_SHIPPING_THRESHOLD,
-  SHIPPING_FEE,
-} from "./features/cart/constants";
+
 import { useCart } from "./features/cart/hooks/useCart";
 import type { CartItem } from "./features/cart/types";
+import { selectIsAllSelected, selectIsIndeterminate, selectShippingFee, selectSubtotal } from "./features/cart/selectors";
 
 function App() {
   const { cartFetch, selectedIds, dispatch } = useCart();
@@ -16,14 +14,12 @@ function App() {
   const items: CartItem[] =
     cartFetch.status === "success" ? cartFetch.items : [];
 
-  const isAllSelected = items.length > 0 && items.length === selectedIds.size;
-  const isIndeterminate = selectedIds.size > 0 && !isAllSelected;
+  const isAllSelected = selectIsAllSelected(items, selectedIds);
+  const isIndeterminate = selectIsIndeterminate(items, selectedIds);
 
-  const subtotal = items
-    .filter((item) => selectedIds.has(item.id))
-    .reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const subtotal = selectSubtotal(items, selectedIds);
 
-  const shippingFee = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
+  const shippingFee = selectShippingFee(items, selectedIds);
 
   const toggledId = (id: string) => {
     dispatch({ type: "TOGGLE_ITEM", id: id });

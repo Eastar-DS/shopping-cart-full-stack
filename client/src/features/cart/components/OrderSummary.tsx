@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { colors } from "../../../shared/styles/tokens";
 import infoIcon from "../../../assets/icons/info-outline.svg";
-import { FREE_SHIPPING_THRESHOLD } from "../constants";
+import { FREE_SHIPPING_THRESHOLD } from "../selectors";
 
 interface OrderSummaryProps {
   subtotal: number;
