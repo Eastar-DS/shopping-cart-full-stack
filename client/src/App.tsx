@@ -1,21 +1,17 @@
 import styled from "@emotion/styled";
 import { colors, fonts } from "./shared/styles/tokens";
 import { GlobalStyles } from "./shared/styles/GlobalStyles";
-import { useEffect, useState } from "react";
-import type { CartFetchState, CartItem } from "./features/cart/types";
-import { getCart } from "./features/cart/api/cart";
-import { toUserMessage } from "./shared/api/errorMessages";
 import { CartItemRow } from "./features/cart/components/CartItemRow";
-import infoIcon from "./assets/icons/info-outline.svg";
-
-const FREE_SHIPPING_THRESHOLD = 100_000;
-const SHIPPING_FEE = 3_000;
+import { OrderSummary } from "./features/cart/components/OrderSummary";
+import {
+  FREE_SHIPPING_THRESHOLD,
+  SHIPPING_FEE,
+} from "./features/cart/constants";
+import { useCart } from "./features/cart/hooks/useCart";
+import type { CartItem } from "./features/cart/types";
 
 function App() {
-  const [cartFetch, setCartFetch] = useState<CartFetchState>({
-    status: "idle",
-  });
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const { cartFetch, selectedIds, dispatch } = useCart();
 
   const items: CartItem[] =
     cartFetch.status === "success" ? cartFetch.items : [];
@@ -28,41 +24,18 @@ function App() {
     .reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
   const shippingFee = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
-  const total = subtotal + shippingFee;
 
   const toggledId = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
+    dispatch({ type: "TOGGLE_ITEM", id: id });
   };
 
   const toggleAll = () => {
     if (isAllSelected) {
-      setSelectedIds(new Set());
+      dispatch({ type: "DESELECT_ALL" });
     } else {
-      setSelectedIds(new Set(items.map((item) => item.id)));
+      dispatch({ type: "SELECT_ALL", ids: items.map((item) => item.id) });
     }
   };
-
-  useEffect(() => {
-    const fetchCartItems = async () => {
-      setCartFetch({ status: "loading" });
-      try {
-        const data: CartItem[] = await getCart();
-        setCartFetch({ status: "success", items: data });
-      } catch (e) {
-        const message = toUserMessage(e);
-        setCartFetch({ status: "error", message: message });
-      }
-    };
-    fetchCartItems();
-  }, []);
 
   const cartContent = (() => {
     switch (cartFetch.status) {
@@ -86,27 +59,7 @@ function App() {
                 onToggle={() => toggledId(item.id)}
               />
             ))}
-            <Hint>
-              <img src={infoIcon} alt="" width={16} height={16} />총 주문 금액이{" "}
-              {FREE_SHIPPING_THRESHOLD}원 이상일 경우 무료 배송됩니다.
-            </Hint>
-            <OrderSummary>
-              <SummaryRow>
-                <span>주문 금액</span>
-                <span>{subtotal.toLocaleString()}원</span>
-              </SummaryRow>
-              <SummaryRow>
-                <span>배송비</span>
-                <span>{shippingFee.toLocaleString()}원</span>
-              </SummaryRow>
-            </OrderSummary>
-
-            <OrderSummary>
-              <SummaryRow>
-                <span>총 결제 금액</span>
-                <span>{total.toLocaleString()}원</span>
-              </SummaryRow>
-            </OrderSummary>
+            <OrderSummary subtotal={subtotal} shippingFee={shippingFee} />
           </>
         );
 
@@ -143,36 +96,6 @@ const PageTitle = styled.h1`
   font-size: ${fonts.pageTitle.fontSize};
   color: ${colors.textPrimary};
   margin: 0;
-`;
-
-const Hint = styled.p`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin: 16px 0;
-  font-size: 12px;
-  color: ${colors.textPrimary};
-  opacity: 0.6;
-`;
-
-const OrderSummary = styled.section`
-  padding-top: 16px;
-  border-top: 1px solid ${colors.divider};
-
-  & + & {
-    margin-top: 16px;
-  }
-`;
-
-const SummaryRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-
-  &:last-of-type {
-    margin-bottom: 0;
-  }
 `;
 
 export default App;
