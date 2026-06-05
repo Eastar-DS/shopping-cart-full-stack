@@ -39,7 +39,7 @@ describe("Product API", () => {
       id: "1",
       name: "EASTER",
       price: 100000000000,
-      imageUrl: "/testURL1",
+      imageUrl: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop",
     });
   });
 
