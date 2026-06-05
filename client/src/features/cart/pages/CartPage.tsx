@@ -1,5 +1,5 @@
-// features/cart/pages/CartPage.tsx
 import styled from "@emotion/styled";
+import { useNavigate } from "react-router-dom";
 import { colors, fonts } from "../../../shared/styles/tokens";
 import { CartItemRow } from "../components/CartItemRow";
 import { OrderSummary } from "../components/OrderSummary";
@@ -12,10 +12,13 @@ import {
   selectSubtotal,
 } from "../selectors";
 import { Checkbox } from "../../../shared/components/CheckBox";
+import { Button } from "../../../shared/components/Button";
+import type { CheckoutState } from "../../checkout/types";
 
 export function CartPage() {
   const { cartFetch, selectedIds, dispatch, updateItem, removeItem } =
     useCart();
+  const navigate = useNavigate();
 
   const items: CartItem[] =
     cartFetch.status === "success" ? cartFetch.items : [];
@@ -29,6 +32,17 @@ export function CartPage() {
   const toggleAll = () => {
     if (isAllSelected) dispatch({ type: "DESELECT_ALL" });
     else dispatch({ type: "SELECT_ALL", ids: items.map((i) => i.id) });
+  };
+
+  const handleProceed = () => {
+    const selectedItems = items.filter((item) => selectedIds.has(item.id));
+    const total = subtotal + shippingFee;
+    const state: CheckoutState = {
+      kindsCount: selectedItems.length,
+      totalQuantity: selectedItems.reduce((sum, item) => sum + item.quantity, 0),
+      total,
+    };
+    navigate("/checkout", { state });
   };
 
   const cartContent = (() => {
@@ -53,7 +67,14 @@ export function CartPage() {
               />
             ))}
             <OrderSummary subtotal={subtotal} shippingFee={shippingFee} />
-            {/* TODO Step 31: 주문 확인 버튼 + navigate('/checkout', {state}) */}
+            <Button
+              variant="primary"
+              fullWidth
+              onClick={handleProceed}
+              disabled={selectedIds.size === 0}
+            >
+              주문 확인
+            </Button>
           </>
         );
       case "loading":
