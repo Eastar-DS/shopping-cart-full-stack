@@ -1,7 +1,6 @@
 import styled from "@emotion/styled";
 import type { CartItem } from "../types";
 import { colors } from "../../../shared/styles/tokens";
-import { CheckIcon } from "../../../assets/icons/CheckIcon";
 import { QuantityStepper } from "./QuantityStepper";
 import { useState } from "react";
 import { Checkbox } from "../../../shared/components/CheckBox";
@@ -132,27 +131,4 @@ const DeleteButton = styled.button`
     opacity: 0.4;
     cursor: not-allowed;
   }
-`;
-
-const CheckboxLabel = styled.label`
-  display: inline-flex;
-  cursor: pointer;
-`;
-
-const HiddenCheckbox = styled.input`
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-`;
-
-const CheckboxBox = styled.span<{ $checked: boolean }>`
-  display: inline-grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 8px;
-  background: ${({ $checked }) => ($checked ? "#000" : "#fff")};
-  border: 1px solid
-    ${({ $checked }) => ($checked ? "#000" : "rgba(0, 0, 0, 0.1)")};
-  transition: all 0.15s;
 `;
