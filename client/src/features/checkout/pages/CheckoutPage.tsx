@@ -17,11 +17,6 @@ export function CheckoutPage() {
 
   const { kindsCount, totalQuantity, total } = state;
 
-  const handleCheckout = () => {
-    alert("주문이 완료되었습니다.");
-    navigate("/", { replace: true });
-  };
-
   return (
     <Page>
       <Title>주문 확인</Title>
@@ -37,7 +32,7 @@ export function CheckoutPage() {
         <TotalAmount>{total.toLocaleString()}원</TotalAmount>
       </TotalSection>
 
-      <Button variant="primary" fullWidth onClick={handleCheckout}>
+      <Button variant="primary" fullWidth disabled>
         결제하기
       </Button>
     </Page>
@@ -48,6 +43,9 @@ const Page = styled.section`
   max-width: 480px;
   margin: 0 auto;
   padding: 24px 16px;
+  min-height: calc(100vh - 64px);
+  background: ${colors.background};
+  box-sizing: border-box;
 `;
 
 const Title = styled.h1`
