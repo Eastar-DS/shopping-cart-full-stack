@@ -15,7 +15,7 @@ import {
 import { CheckIcon } from "./assets/icons/CheckIcon";
 
 function App() {
-  const { cartFetch, selectedIds, dispatch } = useCart();
+  const { cartFetch, selectedIds, dispatch, updateItem } = useCart();
 
   const items: CartItem[] =
     cartFetch.status === "success" ? cartFetch.items : [];
@@ -48,6 +48,7 @@ function App() {
               <HiddenCheckbox
                 type="checkbox"
                 checked={isAllSelected}
+                aria-checked={isIndeterminate ? "mixed" : isAllSelected}
                 onChange={toggleAll}
               />
               <CheckboxBox $checked={isAllSelected}>
@@ -64,6 +65,7 @@ function App() {
                 item={item}
                 isSelected={selectedIds.has(item.id)}
                 onToggle={() => toggledId(item.id)}
+                onUpdateQuantity={(next) => updateItem(item.id, next)}
               />
             ))}
             <OrderSummary subtotal={subtotal} shippingFee={shippingFee} />
