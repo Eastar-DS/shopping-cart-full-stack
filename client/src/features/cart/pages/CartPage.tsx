@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 import { colors, fonts } from "../../../shared/styles/tokens";
 import { CartItemRow } from "../components/CartItemRow";
+import { EmptyCart } from "../components/EmptyCart";
 import { OrderSummary } from "../components/OrderSummary";
 import { useCart } from "../hooks/useCart";
 import type { CartItem } from "../types";
@@ -16,7 +17,7 @@ import { Button } from "../../../shared/components/Button";
 import type { CheckoutState } from "../../checkout/types";
 
 export function CartPage() {
-  const { cartFetch, selectedIds, dispatch, updateItem, removeItem } =
+  const { cartFetch, selectedIds, dispatch, updateItem, removeItem, refetch } =
     useCart();
   const navigate = useNavigate();
 
@@ -48,6 +49,7 @@ export function CartPage() {
   const cartContent = (() => {
     switch (cartFetch.status) {
       case "success":
+        if (items.length === 0) return <EmptyCart />;
         return (
           <>
             <Checkbox
@@ -78,9 +80,16 @@ export function CartPage() {
           </>
         );
       case "loading":
-        return <p>로딩중</p>;
+        return <LoadingText role="status">로딩중</LoadingText>;
       case "error":
-        return <p>{cartFetch.message}</p>;
+        return (
+          <ErrorBox role="alert">
+            <ErrorText>{cartFetch.message}</ErrorText>
+            <Button variant="primary" onClick={() => refetch()}>
+              다시 시도
+            </Button>
+          </ErrorBox>
+        );
       case "idle":
         return null;
     }
@@ -120,4 +129,25 @@ const Subtitle = styled.p`
   font-weight: 500;
   color: ${colors.textPrimary};
   margin: 8px 0 16px;
+`;
+
+const LoadingText = styled.p`
+  padding: 64px 24px;
+  text-align: center;
+  color: ${colors.textPrimary};
+  margin: 0;
+`;
+
+const ErrorBox = styled.div`
+  padding: 64px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+`;
+
+const ErrorText = styled.p`
+  color: ${colors.textPrimary};
+  margin: 0;
 `;
