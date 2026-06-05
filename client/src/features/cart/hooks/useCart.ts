@@ -1,4 +1,11 @@
-import { useEffect, useReducer, useRef, useState, type Dispatch } from "react";
+import {
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+  type Dispatch,
+} from "react";
 import type { CartFetchState, CartItem } from "../types";
 import { selectionReducer, type SelectionAction } from "../selectionReducer";
 import { getCart, removeCartItem, updateQuantity } from "../api/cart";
@@ -16,6 +23,7 @@ export interface UseCartReturn {
   dispatch: Dispatch<SelectionAction>;
   updateItem: (id: string, quantity: number) => Promise<void>;
   removeItem: (id: string) => Promise<void>;
+  refetch: () => Promise<void>;
 }
 
 export function useCart(): UseCartReturn {
@@ -50,25 +58,31 @@ export function useCart(): UseCartReturn {
     } catch {}
   }, [selectedIds]);
 
-  useEffect(() => {
-    const fetchCartItems = async () => {
-      setCartFetch({ status: "loading" });
-      try {
-        const data: CartItem[] = await getCart();
-        setCartFetch({ status: "success", items: data });
+  const fetchCartItems = useCallback(async () => {
+    setCartFetch({ status: "loading" });
+    try {
+      const data: CartItem[] = await getCart();
+      setCartFetch({ status: "success", items: data });
 
-        const itemIds = data.map((item) => item.id);
-        const nextIds = hasStoredSelectionRef.current
-          ? itemIds.filter((id) => selectedIds.has(id))
-          : itemIds;
-        dispatch({ type: "SELECT_ALL", ids: nextIds });
-      } catch (e) {
-        const message = toUserMessage(e);
-        setCartFetch({ status: "error", message: message });
-      }
-    };
-    fetchCartItems();
+      const itemIds = data.map((item) => item.id);
+      const nextIds = hasStoredSelectionRef.current
+        ? itemIds.filter((id) => selectedIdsRef.current.has(id))
+        : itemIds;
+      dispatch({ type: "SELECT_ALL", ids: nextIds });
+    } catch (e) {
+      const message = toUserMessage(e);
+      setCartFetch({ status: "error", message });
+    }
   }, []);
+
+  const selectedIdsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    selectedIdsRef.current = selectedIds;
+  }, [selectedIds]);
+
+  useEffect(() => {
+    fetchCartItems();
+  }, [fetchCartItems]);
 
   const updateItem = async (id: string, quantity: number): Promise<void> => {
     try {
@@ -107,5 +121,12 @@ export function useCart(): UseCartReturn {
     }
   };
 
-  return { cartFetch, selectedIds, dispatch, updateItem, removeItem };
+  return {
+    cartFetch,
+    selectedIds,
+    dispatch,
+    updateItem,
+    removeItem,
+    refetch: fetchCartItems,
+  };
 }
