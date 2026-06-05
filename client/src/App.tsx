@@ -6,7 +6,13 @@ import { OrderSummary } from "./features/cart/components/OrderSummary";
 
 import { useCart } from "./features/cart/hooks/useCart";
 import type { CartItem } from "./features/cart/types";
-import { selectIsAllSelected, selectIsIndeterminate, selectShippingFee, selectSubtotal } from "./features/cart/selectors";
+import {
+  selectIsAllSelected,
+  selectIsIndeterminate,
+  selectShippingFee,
+  selectSubtotal,
+} from "./features/cart/selectors";
+import { CheckIcon } from "./assets/icons/CheckIcon";
 
 function App() {
   const { cartFetch, selectedIds, dispatch } = useCart();
@@ -38,15 +44,20 @@ function App() {
       case "success":
         return (
           <>
-            <label>
-              <input
+            <CheckboxLabel>
+              <HiddenCheckbox
                 type="checkbox"
                 checked={isAllSelected}
-                aria-checked={isIndeterminate ? "mixed" : isAllSelected}
                 onChange={toggleAll}
               />
-              전체선택
-            </label>
+              <CheckboxBox $checked={isAllSelected}>
+                <CheckIcon
+                  color={isAllSelected ? "#fff" : "rgba(0, 0, 0, 0.1)"}
+                />
+              </CheckboxBox>
+              <span>전체선택</span>
+            </CheckboxLabel>
+
             {items.map((item) => (
               <CartItemRow
                 key={item.id}
@@ -72,6 +83,11 @@ function App() {
       <GlobalStyles />
       <Page>
         <PageTitle>장바구니</PageTitle>
+        {cartFetch.status === "success" && cartFetch.items.length > 0 && (
+          <Subtitle>
+            현재 {cartFetch.items.length}종류의 상품이 담겨있습니다.
+          </Subtitle>
+        )}
         {cartContent}
       </Page>
     </>
@@ -92,6 +108,39 @@ const PageTitle = styled.h1`
   font-size: ${fonts.pageTitle.fontSize};
   color: ${colors.textPrimary};
   margin: 0;
+`;
+
+const Subtitle = styled.p`
+  font-size: 12px;
+  font-weight: 500;
+  color: ${colors.textPrimary};
+  margin: 8px 0 16px;
+`;
+
+const CheckboxLabel = styled.label`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-bottom: 20px;
+`;
+
+const HiddenCheckbox = styled.input`
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+`;
+
+const CheckboxBox = styled.span<{ $checked: boolean }>`
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: ${({ $checked }) => ($checked ? "#000" : "#fff")};
+  border: 1px solid
+    ${({ $checked }) => ($checked ? "#000" : "rgba(0, 0, 0, 0.1)")};
+  transition: all 0.15s;
 `;
 
 export default App;

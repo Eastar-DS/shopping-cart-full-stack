@@ -71,18 +71,22 @@ const InfoStack = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: 8px;
+  gap: 4px;
 `;
 
 const ProductName = styled.span`
-  font-size: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  height: 15px;
   color: ${colors.textPrimary};
 `;
 
 const Price = styled.span`
-  font-size: 20px;
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 24px;
   font-weight: 700;
   color: ${colors.textPrimary};
+  margin-bottom: 20px;
 `;
 
 const DeleteButton = styled.button`
