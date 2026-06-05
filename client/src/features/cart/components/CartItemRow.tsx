@@ -3,14 +3,31 @@ import type { CartItem } from "../types";
 import { colors } from "../../../shared/styles/tokens";
 import { CheckIcon } from "../../../assets/icons/CheckIcon";
 import { QuantityStepper } from "./QuantityStepper";
+import { useState } from "react";
 
 interface CartItemRowProps {
   item: CartItem;
   isSelected: boolean;
   onToggle: () => void;
+  onUpdateQuantity: (next: number) => Promise<void>;
 }
 
-export function CartItemRow({ item, isSelected, onToggle }: CartItemRowProps) {
+export function CartItemRow({
+  item,
+  isSelected,
+  onToggle,
+  onUpdateQuantity,
+}: CartItemRowProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleQuantityChange = async (next: number) => {
+    setIsLoading(true);
+    try {
+      await onUpdateQuantity(next);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <Row>
       <TopRow>
@@ -33,7 +50,8 @@ export function CartItemRow({ item, isSelected, onToggle }: CartItemRowProps) {
           <Price>{item.product.price.toLocaleString()}원</Price>
           <QuantityStepper
             value={item.quantity}
-            onChange={(next) => console.log("TODO: PATCH", item.id, next)}
+            onChange={handleQuantityChange}
+            disabled={isLoading}
           />
         </InfoStack>
       </BottomRow>

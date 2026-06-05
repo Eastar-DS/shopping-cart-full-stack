@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useRef, useState, type Dispatch } from "react";
 import type { CartFetchState, CartItem } from "../types";
 import { selectionReducer, type SelectionAction } from "../selectionReducer";
-import { getCart } from "../api/cart";
+import { getCart, updateQuantity } from "../api/cart";
 import { toUserMessage } from "../../../shared/api/errorMessages";
 import {
   fromSelectedIdsArray,
@@ -14,6 +14,7 @@ export interface UseCartReturn {
   cartFetch: CartFetchState;
   selectedIds: Set<string>;
   dispatch: Dispatch<SelectionAction>;
+  updateItem: (id: string, quantity: number) => Promise<void>;
 }
 
 export function useCart(): UseCartReturn {
@@ -68,5 +69,23 @@ export function useCart(): UseCartReturn {
     fetchCartItems();
   }, []);
 
-  return { cartFetch, selectedIds, dispatch };
+  const updateItem = async (id: string, quantity: number): Promise<void> => {
+    try {
+      await updateQuantity(id, quantity);
+      setCartFetch((prev) => {
+        if (prev.status !== "success") return prev;
+        return {
+          ...prev,
+          items: prev.items.map((item) =>
+            item.id === id ? { ...item, quantity } : item,
+          ),
+        };
+      });
+    } catch (e) {
+      alert(toUserMessage(e));
+      throw e;
+    }
+  };
+
+  return { cartFetch, selectedIds, dispatch, updateItem };
 }

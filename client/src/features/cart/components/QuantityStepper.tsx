@@ -8,14 +8,19 @@ const MAX = 99;
 interface QuantityStepperProps {
   value: number;
   onChange: (next: number) => void;
+  disabled?: boolean;
 }
 
-export function QuantityStepper({ value, onChange }: QuantityStepperProps) {
+export function QuantityStepper({
+  value,
+  onChange,
+  disabled = false,
+}: QuantityStepperProps) {
   return (
     <Container>
       <IconButton
         type="button"
-        disabled={value <= MIN}
+        disabled={disabled || value <= MIN}
         onClick={() => onChange(value - 1)}
         aria-label="수량 감소"
       >
@@ -24,7 +29,7 @@ export function QuantityStepper({ value, onChange }: QuantityStepperProps) {
       <Value>{value}</Value>
       <IconButton
         type="button"
-        disabled={value >= MAX}
+        disabled={disabled || value >= MAX}
         onClick={() => onChange(value + 1)}
         aria-label="수량 증가"
       >
