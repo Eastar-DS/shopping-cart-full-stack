@@ -15,7 +15,7 @@ import {
 import { CheckIcon } from "./assets/icons/CheckIcon";
 
 function App() {
-  const { cartFetch, selectedIds, dispatch, updateItem } = useCart();
+  const { cartFetch, selectedIds, dispatch, updateItem, removeItem } = useCart();
 
   const items: CartItem[] =
     cartFetch.status === "success" ? cartFetch.items : [];
@@ -66,6 +66,7 @@ function App() {
                 isSelected={selectedIds.has(item.id)}
                 onToggle={() => toggledId(item.id)}
                 onUpdateQuantity={(next) => updateItem(item.id, next)}
+                onRemove={() => removeItem(item.id)}
               />
             ))}
             <OrderSummary subtotal={subtotal} shippingFee={shippingFee} />

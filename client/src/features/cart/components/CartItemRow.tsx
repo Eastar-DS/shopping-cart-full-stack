@@ -10,6 +10,7 @@ interface CartItemRowProps {
   isSelected: boolean;
   onToggle: () => void;
   onUpdateQuantity: (next: number) => Promise<void>;
+  onRemove: () => Promise<void>;
 }
 
 export function CartItemRow({
@@ -17,6 +18,7 @@ export function CartItemRow({
   isSelected,
   onToggle,
   onUpdateQuantity,
+  onRemove,
 }: CartItemRowProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,6 +26,16 @@ export function CartItemRow({
     setIsLoading(true);
     try {
       await onUpdateQuantity(next);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemove = async () => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+    setIsLoading(true);
+    try {
+      await onRemove();
     } finally {
       setIsLoading(false);
     }
@@ -41,7 +53,9 @@ export function CartItemRow({
             <CheckIcon color={isSelected ? "#fff" : "rgba(0, 0, 0, 0.1)"} />
           </CheckboxBox>
         </CheckboxLabel>
-        <DeleteButton type="button">삭제</DeleteButton>
+        <DeleteButton type="button" onClick={handleRemove} disabled={isLoading}>
+          삭제
+        </DeleteButton>
       </TopRow>
       <BottomRow>
         <ProductImage src={item.product.imageUrl} alt={item.product.name} />
@@ -117,6 +131,11 @@ const DeleteButton = styled.button`
   font-weight: 500;
   color: ${colors.textPrimary};
   cursor: pointer;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 `;
 
 const CheckboxLabel = styled.label`

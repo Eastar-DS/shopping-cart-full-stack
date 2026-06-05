@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useRef, useState, type Dispatch } from "react";
 import type { CartFetchState, CartItem } from "../types";
 import { selectionReducer, type SelectionAction } from "../selectionReducer";
-import { getCart, updateQuantity } from "../api/cart";
+import { getCart, removeCartItem, updateQuantity } from "../api/cart";
 import { toUserMessage } from "../../../shared/api/errorMessages";
 import {
   fromSelectedIdsArray,
@@ -15,6 +15,7 @@ export interface UseCartReturn {
   selectedIds: Set<string>;
   dispatch: Dispatch<SelectionAction>;
   updateItem: (id: string, quantity: number) => Promise<void>;
+  removeItem: (id: string) => Promise<void>;
 }
 
 export function useCart(): UseCartReturn {
@@ -87,5 +88,24 @@ export function useCart(): UseCartReturn {
     }
   };
 
-  return { cartFetch, selectedIds, dispatch, updateItem };
+  const removeItem = async (id: string): Promise<void> => {
+    try {
+      await removeCartItem(id);
+      setCartFetch((prev) => {
+        if (prev.status !== "success") return prev;
+        return {
+          ...prev,
+          items: prev.items.filter((item) => item.id !== id),
+        };
+      });
+      if (selectedIds.has(id)) {
+        dispatch({ type: "TOGGLE_ITEM", id });
+      }
+    } catch (e) {
+      alert(toUserMessage(e));
+      throw e;
+    }
+  };
+
+  return { cartFetch, selectedIds, dispatch, updateItem, removeItem };
 }
