@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { colors } from "../../../shared/styles/tokens";
-import infoIcon from "../../../assets/icons/info-outline.svg";
 import { FREE_SHIPPING_THRESHOLD } from "../selectors";
+import { InfoOutlineIcon } from "../../../assets/icons/InfoOutlineIcon";
 
 interface OrderSummaryProps {
   subtotal: number;
@@ -13,25 +13,25 @@ export function OrderSummary({ subtotal, shippingFee }: OrderSummaryProps) {
   return (
     <>
       <Hint>
-        <img src={infoIcon} alt="" width={16} height={16} />총 주문 금액이{" "}
+        <InfoOutlineIcon width={12} height={12} />총 주문 금액이{" "}
         {FREE_SHIPPING_THRESHOLD.toLocaleString()}원 이상일 경우 무료
         배송됩니다.
       </Hint>
       <Section>
         <SummaryRow>
-          <span>주문 금액</span>
-          <span>{subtotal.toLocaleString()}원</span>
+          <Label>주문 금액</Label>
+          <Amount>{subtotal.toLocaleString()}원</Amount>
         </SummaryRow>
         <SummaryRow>
-          <span>배송비</span>
-          <span>{shippingFee.toLocaleString()}원</span>
+          <Label>배송비</Label>
+          <Amount>{shippingFee.toLocaleString()}원</Amount>
         </SummaryRow>
       </Section>
 
       <Section>
         <SummaryRow>
-          <span>총 결제 금액</span>
-          <span>{total.toLocaleString()}원</span>
+          <Label>총 결제 금액</Label>
+          <Amount>{total.toLocaleString()}원</Amount>
         </SummaryRow>
       </Section>
     </>
@@ -58,6 +58,19 @@ const SummaryRow = styled.div`
   }
 `;
 
+const Label = styled.span`
+  font-size: 16px;
+  font-weight: 700;
+  color: ${colors.textPrimary};
+`;
+
+const Amount = styled.span`
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: ${colors.textPrimary};
+`;
+
 const Hint = styled.p`
   display: flex;
   align-items: center;
@@ -65,5 +78,4 @@ const Hint = styled.p`
   margin: 16px 0;
   font-size: 12px;
   color: ${colors.textPrimary};
-  opacity: 0.6;
 `;
