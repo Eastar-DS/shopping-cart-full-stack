@@ -15,7 +15,7 @@ export function Header() {
           onClick={() => navigate(-1)}
           aria-label="이전 페이지로"
         >
-          <BackIcon width={32} height={32} />
+          <BackIcon width={25} height={23} />
         </BackButton>
       ) : (
         <Logo to="/">SHOP</Logo>
@@ -25,13 +25,15 @@ export function Header() {
 }
 
 const HeaderBar = styled.header`
+  max-width: 480px;
+  margin: 0 auto;
   background: #000000;
   color: #ffffff;
-  padding: 16px 24px;
+  height: 64px;
+  padding: 0 24px;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  height: 64px;
-  box-sizing: border-box;
 `;
 
 const Logo = styled(Link)`
@@ -47,7 +49,7 @@ const BackButton = styled.button`
   border: none;
   padding: 0;
   cursor: pointer;
-  color: inherit; /* HeaderBar 의 흰색 상속 → BackIcon 자동 흰 */
+  color: inherit;
   display: grid;
   place-items: center;
 `;
