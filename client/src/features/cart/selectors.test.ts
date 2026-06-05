@@ -1,7 +1,6 @@
 import {
   selectSubtotal,
   selectShippingFee,
-  selectTotal,
   selectIsAllSelected,
   selectIsIndeterminate,
   FREE_SHIPPING_THRESHOLD,
