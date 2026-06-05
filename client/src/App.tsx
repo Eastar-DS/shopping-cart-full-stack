@@ -13,9 +13,11 @@ import {
   selectSubtotal,
 } from "./features/cart/selectors";
 import { CheckIcon } from "./assets/icons/CheckIcon";
+import { Checkbox } from "./shared/components/CheckBox";
 
 function App() {
-  const { cartFetch, selectedIds, dispatch, updateItem, removeItem } = useCart();
+  const { cartFetch, selectedIds, dispatch, updateItem, removeItem } =
+    useCart();
 
   const items: CartItem[] =
     cartFetch.status === "success" ? cartFetch.items : [];
@@ -44,20 +46,12 @@ function App() {
       case "success":
         return (
           <>
-            <CheckboxLabel>
-              <HiddenCheckbox
-                type="checkbox"
-                checked={isAllSelected}
-                aria-checked={isIndeterminate ? "mixed" : isAllSelected}
-                onChange={toggleAll}
-              />
-              <CheckboxBox $checked={isAllSelected}>
-                <CheckIcon
-                  color={isAllSelected ? "#fff" : "rgba(0, 0, 0, 0.1)"}
-                />
-              </CheckboxBox>
-              <span>전체선택</span>
-            </CheckboxLabel>
+            <Checkbox
+              checked={isAllSelected}
+              indeterminate={isIndeterminate} // ★ 부분선택 aria-checked="mixed"
+              onChange={toggleAll}
+              label="전체선택"
+            />
 
             {items.map((item) => (
               <CartItemRow

@@ -4,6 +4,7 @@ import { colors } from "../../../shared/styles/tokens";
 import { CheckIcon } from "../../../assets/icons/CheckIcon";
 import { QuantityStepper } from "./QuantityStepper";
 import { useState } from "react";
+import { Checkbox } from "../../../shared/components/CheckBox";
 
 interface CartItemRowProps {
   item: CartItem;
@@ -43,16 +44,11 @@ export function CartItemRow({
   return (
     <Row>
       <TopRow>
-        <CheckboxLabel>
-          <HiddenCheckbox
-            type="checkbox"
-            checked={isSelected}
-            onChange={onToggle}
-          />
-          <CheckboxBox $checked={isSelected}>
-            <CheckIcon color={isSelected ? "#fff" : "rgba(0, 0, 0, 0.1)"} />
-          </CheckboxBox>
-        </CheckboxLabel>
+        <Checkbox
+          checked={isSelected}
+          onChange={onToggle}
+          disabled={isLoading}
+        />
         <DeleteButton type="button" onClick={handleRemove} disabled={isLoading}>
           삭제
         </DeleteButton>
