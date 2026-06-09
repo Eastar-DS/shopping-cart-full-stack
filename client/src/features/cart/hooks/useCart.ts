@@ -1,12 +1,8 @@
 import { useEffect, useReducer, useRef, type Dispatch } from "react";
-import { queryStore } from "../../../shared/queries";
-import { toUserMessage } from "../../../shared/api/errorMessages";
 import {
   fromSelectedIdsArray,
   toSelectedIdsArray,
 } from "../../../shared/utils/selectedIds";
-import { removeCartItem, updateQuantity } from "../api/cart";
-import { CART_QUERY_KEY } from "./useCartQuery";
 import { selectionReducer, type SelectionAction } from "../selectionReducer";
 import type { CartItem } from "../types";
 
@@ -15,8 +11,6 @@ const SELECTED_IDS_STORAGE_KEY = "shopping-cart:selectedIds";
 export interface UseCartReturn {
   selectedIds: Set<string>;
   dispatch: Dispatch<SelectionAction>;
-  updateItem: (id: string, quantity: number) => Promise<void>;
-  removeItem: (id: string) => Promise<void>;
 }
 
 export function useCart(items: CartItem[]): UseCartReturn {
@@ -48,7 +42,7 @@ export function useCart(items: CartItem[]): UseCartReturn {
     } catch {}
   }, [selectedIds]);
 
-  // items 가 바뀔 때만 동기화 — selectedIds 는 의도적으로 deps 제외 (재귀 sync 방지)
+  // items 가 바뀔 때 — stored 가 있으면 교집합, 없으면 전체 선택
   const lastSyncedItemsRef = useRef<CartItem[] | null>(null);
   useEffect(() => {
     if (lastSyncedItemsRef.current === items) return;
@@ -61,39 +55,5 @@ export function useCart(items: CartItem[]): UseCartReturn {
     dispatch({ type: "SELECT_ALL", ids: nextIds });
   }, [items, selectedIds]);
 
-  const updateItem = async (id: string, quantity: number): Promise<void> => {
-    try {
-      const updated = await updateQuantity(id, quantity);
-      const current = queryStore.getSnapshot<CartItem[]>(CART_QUERY_KEY) ?? [];
-      const next = current.map((item) =>
-        item.id === id ? updated : item,
-      );
-      queryStore.setQuery(CART_QUERY_KEY, next);
-    } catch (e) {
-      alert(toUserMessage(e));
-      throw e;
-    }
-  };
-
-  const removeItem = async (id: string): Promise<void> => {
-    try {
-      await removeCartItem(id);
-      const current = queryStore.getSnapshot<CartItem[]>(CART_QUERY_KEY) ?? [];
-      const next = current.filter((item) => item.id !== id);
-      queryStore.setQuery(CART_QUERY_KEY, next);
-      if (selectedIds.has(id)) {
-        dispatch({ type: "TOGGLE_ITEM", id });
-      }
-    } catch (e) {
-      alert(toUserMessage(e));
-      throw e;
-    }
-  };
-
-  return {
-    selectedIds,
-    dispatch,
-    updateItem,
-    removeItem,
-  };
+  return { selectedIds, dispatch };
 }

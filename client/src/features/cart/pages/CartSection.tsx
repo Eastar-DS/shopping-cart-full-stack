@@ -7,7 +7,9 @@ import { CartItemRow } from "../components/CartItemRow";
 import { EmptyCart } from "../components/EmptyCart";
 import { OrderSummary } from "../components/OrderSummary";
 import { useCart } from "../hooks/useCart";
+import { useCartDeleteMutation } from "../hooks/useCartDeleteMutation";
 import { useCartQuery } from "../hooks/useCartQuery";
+import { useCartUpdateMutation } from "../hooks/useCartUpdateMutation";
 import {
   selectIsAllSelected,
   selectIsIndeterminate,
@@ -18,7 +20,9 @@ import type { CheckoutState } from "../../checkout/types";
 
 export function CartSection() {
   const items = useCartQuery();
-  const { selectedIds, dispatch, updateItem, removeItem } = useCart(items);
+  const { selectedIds, dispatch } = useCart(items);
+  const { mutate: updateMutate } = useCartUpdateMutation();
+  const { mutate: deleteMutate } = useCartDeleteMutation();
   const navigate = useNavigate();
 
   if (items.length === 0) return <EmptyCart />;
@@ -60,8 +64,10 @@ export function CartSection() {
           item={item}
           isSelected={selectedIds.has(item.id)}
           onToggle={() => toggledId(item.id)}
-          onUpdateQuantity={(next) => updateItem(item.id, next)}
-          onRemove={() => removeItem(item.id)}
+          onUpdateQuantity={(next) =>
+            updateMutate({ id: item.id, quantity: next })
+          }
+          onRemove={() => deleteMutate(item.id)}
         />
       ))}
       <OrderSummary subtotal={subtotal} shippingFee={shippingFee} />
