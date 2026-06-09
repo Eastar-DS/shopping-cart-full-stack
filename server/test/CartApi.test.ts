@@ -51,15 +51,19 @@ describe("Cart API", () => {
     await request(app).get("/carts").expect(500);
   });
 
-  test("PATCH /carts/:id는 수량을 변경하고 변경 결과를 응답한다", async () => {
+  test("PATCH /carts/:id는 수량을 변경하고 갱신된 장바구니 항목 전체를 응답한다", async () => {
     const app = await loadApp();
     const response = await request(app)
       .patch("/carts/1")
       .send({ quantity: 3 })
       .expect(200);
 
-    expect(response.body).toEqual({
+    expect(response.body).toMatchObject({
       id: "1",
+      product: {
+        id: "1",
+        name: "EASTER",
+      },
       quantity: 3,
     });
   });

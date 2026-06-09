@@ -21,12 +21,13 @@ describe("cartService", () => {
     expect(cartService.getCartItems()).toHaveLength(3);
   });
 
-  test("updateQuantity는 수량을 변경하고 변경된 수량을 반환한다", async () => {
+  test("updateQuantity는 수량을 변경하고 갱신된 장바구니 항목을 반환한다", async () => {
     const { cartService } = await loadCartService();
 
-    const quantity = cartService.updateQuantity("1", { quantity: 3 });
+    const updated = cartService.updateQuantity("1", { quantity: 3 });
 
-    expect(quantity).toBe(3);
+    expect(updated.id).toBe("1");
+    expect(updated.getQuantity()).toBe(3);
     expect(
       cartService
         .getCartItems()
