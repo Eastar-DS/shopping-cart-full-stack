@@ -9,9 +9,23 @@ interface UpdateVariables {
   quantity: number;
 }
 
+interface UpdateContext {
+  prev: CartItem[];
+}
+
 export function useCartUpdateMutation() {
-  return useMutation<CartItem, UpdateVariables>({
+  return useMutation<CartItem, UpdateVariables, UpdateContext>({
     mutateFn: ({ id, quantity }) => updateQuantity(id, quantity),
+
+    onMutate: ({ id, quantity }) => {
+      const prev = queryStore.getSnapshot<CartItem[]>(CART_QUERY_KEY) ?? [];
+      const next = prev.map((item) =>
+        item.id === id ? { ...item, quantity } : item,
+      );
+      queryStore.setQuery(CART_QUERY_KEY, next);
+      return { prev };
+    },
+
     onSuccess: (updatedItem) => {
       const current = queryStore.getSnapshot<CartItem[]>(CART_QUERY_KEY) ?? [];
       const next = current.map((item) =>
@@ -19,6 +33,10 @@ export function useCartUpdateMutation() {
       );
       queryStore.setQuery(CART_QUERY_KEY, next);
     },
-    onError: (error) => alert(toUserMessage(error)),
+
+    onError: (error, _variables, context) => {
+      queryStore.setQuery(CART_QUERY_KEY, context.prev);
+      alert(toUserMessage(error));
+    },
   });
 }

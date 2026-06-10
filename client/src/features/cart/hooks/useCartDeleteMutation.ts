@@ -4,14 +4,26 @@ import { removeCartItem } from "../api/cart";
 import { CART_QUERY_KEY } from "./useCartQuery";
 import type { CartItem } from "../types";
 
+interface DeleteContext {
+  prev: CartItem[];
+}
+
 export function useCartDeleteMutation() {
-  return useMutation<void, string>({
+  return useMutation<void, string, DeleteContext>({
     mutateFn: (id) => removeCartItem(id),
-    onSuccess: (_data, deletedId) => {
-      const current = queryStore.getSnapshot<CartItem[]>(CART_QUERY_KEY) ?? [];
-      const next = current.filter((item) => item.id !== deletedId);
-      queryStore.setQuery(CART_QUERY_KEY, next);
+
+    onMutate: (id) => {
+      const prev = queryStore.getSnapshot<CartItem[]>(CART_QUERY_KEY) ?? [];
+      queryStore.setQuery(
+        CART_QUERY_KEY,
+        prev.filter((item) => item.id !== id),
+      );
+      return { prev };
     },
-    onError: (error) => alert(toUserMessage(error)),
+
+    onError: (error, _id, context) => {
+      queryStore.setQuery(CART_QUERY_KEY, context.prev);
+      alert(toUserMessage(error));
+    },
   });
 }
