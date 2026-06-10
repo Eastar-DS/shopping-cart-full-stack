@@ -14,10 +14,12 @@ export const selectSubtotal = (
 export const selectShippingFee = (
   items: CartItem[],
   selectedIds: Set<string>,
-): number =>
-  selectSubtotal(items, selectedIds) >= FREE_SHIPPING_THRESHOLD
+): number => {
+  if (selectedIds.size === 0) return 0;
+  return selectSubtotal(items, selectedIds) >= FREE_SHIPPING_THRESHOLD
     ? 0
     : SHIPPING_FEE;
+};
 
 export const selectTotal = (
   items: CartItem[],
