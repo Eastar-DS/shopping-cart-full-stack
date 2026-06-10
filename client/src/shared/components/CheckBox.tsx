@@ -25,7 +25,7 @@ export function Checkbox({
       />
       <CheckboxBox $checked={!!checked} $indeterminate={indeterminate}>
         {indeterminate ? (
-          <MinusIcon color="#000" width={14} height={2} />
+          <MinusIcon color="#fff" width={14} height={2} />
         ) : (
           <CheckIcon color={checked ? '#fff' : 'rgba(0, 0, 0, 0.1)'} />
         )}
@@ -57,7 +57,8 @@ const CheckboxBox = styled.span<{
   width: 24px;
   height: 24px;
   border-radius: 8px;
-  background: ${({ $checked }) => ($checked ? '#000' : '#fff')};
+  background: ${({ $checked, $indeterminate }) =>
+    $checked || $indeterminate ? '#000' : '#fff'};
   border: 1px solid
     ${({ $checked, $indeterminate }) =>
       $checked || $indeterminate ? '#000' : 'rgba(0, 0, 0, 0.1)'};
