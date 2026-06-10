@@ -1,4 +1,4 @@
-import { use, useCallback, useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import { queryStore } from "./queryStore.instance";
 
 interface UseSuspenseQueryOptions<T> {
@@ -25,5 +25,5 @@ export function useSuspenseQuery<T>({
   if (error) throw error;
   if (data !== undefined) return data;
 
-  return use(queryStore.fetch(key, queryFn));
+  throw queryStore.fetch(key, queryFn);
 }
