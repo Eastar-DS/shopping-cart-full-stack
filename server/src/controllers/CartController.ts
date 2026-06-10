@@ -10,9 +10,9 @@ export const cartController = {
 
   updateQuantity(req: Request<IdParams>, res: Response) {
     const id = req.params.id;
-    const quantity = cartService.updateQuantity(id, req.body);
+    const cartItem = cartService.updateQuantity(id, req.body);
 
-    res.status(200).json({ id, quantity });
+    res.status(200).json(cartItem);
   },
 
   deleteCartItem(req: Request<IdParams>, res: Response) {

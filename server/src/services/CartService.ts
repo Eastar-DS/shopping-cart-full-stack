@@ -1,5 +1,6 @@
 import { cartItems } from "../db.js";
 import { InvalidInputError, NotFoundError } from "../errors/HttpError.js";
+import type { CartItem } from "../models/CartItem.js";
 import type { UpdateCartQuantityRequestBody } from "../type.js";
 
 const MIN_QUANTITY = 1;
@@ -35,7 +36,7 @@ export const cartService = {
     return cartItems.findAll();
   },
 
-  updateQuantity(id: string, body: unknown): number {
+  updateQuantity(id: string, body: unknown): CartItem {
     if (!isValidUpdateCartQuantityBody(body)) {
       throw new InvalidInputError();
     }
@@ -46,7 +47,7 @@ export const cartService = {
       throw new NotFoundError();
     }
 
-    return updatedCartItem.getQuantity();
+    return updatedCartItem;
   },
 
   deleteCartItem(id: string): void {

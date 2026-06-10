@@ -82,7 +82,7 @@ npm run dev
 PORT=4000 npm run dev
 ```
 
-## Railway 배포
+## Railway 배포 (server)
 
 Railway에서는 `server` 디렉터리를 하나의 Node.js 서비스로 배포합니다.
 
@@ -93,6 +93,32 @@ Railway에서는 `server` 디렉터리를 하나의 Node.js 서비스로 배포�
 - Start Command: `npm run start`
 
 서버는 Railway가 주입하는 `PORT` 환경 변수를 사용합니다.
+
+환경 변수:
+- `ALLOWED_ORIGINS` (선택) — 콤마로 구분한 추가 CORS origin 목록. Vercel 프로덕션/프리뷰 URL 을 넣습니다.
+  예: `https://shopping-cart.vercel.app,https://shopping-cart-git-main-eastar.vercel.app`
+
+## Vercel 배포 (client)
+
+Vercel에서는 `client` 디렉터리를 Vite SPA 로 배포합니다.
+
+프로젝트 설정:
+- Root Directory: `client`
+- Framework Preset: `Vite` (자동 감지)
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- Install Command: `npm install`
+
+환경 변수 (Production + Preview):
+- `VITE_API_BASE_URL` — Railway 에 배포된 API origin (예: `https://your-api.up.railway.app`)
+
+SPA fallback 은 `client/vercel.json` 에 명시되어 있어 `/checkout` 같은 사후 라우팅도 새로고침 시 404 가 나지 않습니다.
+
+배포 순서:
+1. Railway 에 server 배포 → API origin URL 확보
+2. Railway 의 `ALLOWED_ORIGINS` 에 곧 만들 Vercel URL 등록 (또는 배포 후 추가)
+3. Vercel 에 client 배포 → `VITE_API_BASE_URL` 에 1번 URL 입력
+4. Vercel URL 을 Railway 의 `ALLOWED_ORIGINS` 에 반영(필요 시 redeploy)
 
 ## 검증
 
