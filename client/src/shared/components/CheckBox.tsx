@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import type { InputHTMLAttributes } from 'react';
 import { CheckIcon } from '../../assets/icons/CheckIcon';
+import { MinusIcon } from '../../assets/icons/MinusIcon';
 
 interface CheckboxProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
@@ -22,8 +23,12 @@ export function Checkbox({
         aria-checked={indeterminate ? 'mixed' : !!checked}
         {...rest}
       />
-      <CheckboxBox $checked={!!checked}>
-        <CheckIcon color={checked ? '#fff' : 'rgba(0, 0, 0, 0.1)'} />
+      <CheckboxBox $checked={!!checked} $indeterminate={indeterminate}>
+        {indeterminate ? (
+          <MinusIcon color="#000" width={14} height={2} />
+        ) : (
+          <CheckIcon color={checked ? '#fff' : 'rgba(0, 0, 0, 0.1)'} />
+        )}
       </CheckboxBox>
       {label && <Label>{label}</Label>}
     </Wrapper>
@@ -43,7 +48,10 @@ const HiddenInput = styled.input`
   pointer-events: none;
 `;
 
-const CheckboxBox = styled.span<{ $checked: boolean }>`
+const CheckboxBox = styled.span<{
+  $checked: boolean;
+  $indeterminate: boolean;
+}>`
   display: inline-grid;
   place-items: center;
   width: 24px;
@@ -51,7 +59,8 @@ const CheckboxBox = styled.span<{ $checked: boolean }>`
   border-radius: 8px;
   background: ${({ $checked }) => ($checked ? '#000' : '#fff')};
   border: 1px solid
-    ${({ $checked }) => ($checked ? '#000' : 'rgba(0, 0, 0, 0.1)')};
+    ${({ $checked, $indeterminate }) =>
+      $checked || $indeterminate ? '#000' : 'rgba(0, 0, 0, 0.1)'};
   transition: all 0.15s;
 `;
 
