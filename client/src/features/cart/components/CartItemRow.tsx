@@ -2,15 +2,14 @@ import styled from "@emotion/styled";
 import type { CartItem } from "../types";
 import { colors } from "../../../shared/styles/tokens";
 import { QuantityStepper } from "./QuantityStepper";
-import { useState } from "react";
 import { Checkbox } from "../../../shared/components/CheckBox";
 
 interface CartItemRowProps {
   item: CartItem;
   isSelected: boolean;
   onToggle: () => void;
-  onUpdateQuantity: (next: number) => Promise<void>;
-  onRemove: () => Promise<void>;
+  onUpdateQuantity: (next: number) => void;
+  onRemove: () => void;
 }
 
 export function CartItemRow({
@@ -20,35 +19,16 @@ export function CartItemRow({
   onUpdateQuantity,
   onRemove,
 }: CartItemRowProps) {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleQuantityChange = async (next: number) => {
-    setIsLoading(true);
-    try {
-      await onUpdateQuantity(next);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRemove = async () => {
+  const handleRemove = () => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
-    setIsLoading(true);
-    try {
-      await onRemove();
-    } finally {
-      setIsLoading(false);
-    }
+    onRemove();
   };
+
   return (
     <Row>
       <TopRow>
-        <Checkbox
-          checked={isSelected}
-          onChange={onToggle}
-          disabled={isLoading}
-        />
-        <DeleteButton type="button" onClick={handleRemove} disabled={isLoading}>
+        <Checkbox checked={isSelected} onChange={onToggle} />
+        <DeleteButton type="button" onClick={handleRemove}>
           삭제
         </DeleteButton>
       </TopRow>
@@ -57,11 +37,7 @@ export function CartItemRow({
         <InfoStack>
           <ProductName>{item.product.name}</ProductName>
           <Price>{item.product.price.toLocaleString()}원</Price>
-          <QuantityStepper
-            value={item.quantity}
-            onChange={handleQuantityChange}
-            disabled={isLoading}
-          />
+          <QuantityStepper value={item.quantity} onChange={onUpdateQuantity} />
         </InfoStack>
       </BottomRow>
     </Row>
