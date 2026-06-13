@@ -14,7 +14,7 @@ const productList = [
 export const products = new Products(productList);
 
 export const cartItems = new CartItems([
-  new CartItem('1', productList[0], 1),
-  new CartItem('2', productList[1], 2),
-  new CartItem('3', productList[4], 98),
+  new CartItem('1', productList[0].id, 1),
+  new CartItem('2', productList[1].id, 2),
+  new CartItem('3', productList[4].id, 98),
 ]);

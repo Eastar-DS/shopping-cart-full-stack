@@ -1,4 +1,4 @@
-import { cartItems } from "../db.js";
+import { cartItems, products } from "../db.js";
 import { InvalidInputError, NotFoundError } from "../errors/HttpError.js";
 import type { CartItem } from "../models/CartItem.js";
 import type { UpdateCartQuantityRequestBody } from "../type.js";
@@ -31,12 +31,26 @@ const isValidUpdateCartQuantityBody = (
   return isValidQuantity(body.quantity);
 };
 
+const toCartItemResponse = (cartItem: CartItem) => {
+  const product = products.findById(cartItem.productId);
+
+  if (!product) {
+    throw new NotFoundError();
+  }
+
+  return {
+    id: cartItem.id,
+    product,
+    quantity: cartItem.getQuantity(),
+  };
+};
+
 export const cartService = {
   getCartItems() {
-    return cartItems.findAll();
+    return cartItems.findAll().map(toCartItemResponse);
   },
 
-  updateQuantity(id: string, body: unknown): CartItem {
+  updateQuantity(id: string, body: unknown) {
     if (!isValidUpdateCartQuantityBody(body)) {
       throw new InvalidInputError();
     }
@@ -47,7 +61,7 @@ export const cartService = {
       throw new NotFoundError();
     }
 
-    return updatedCartItem;
+    return toCartItemResponse(updatedCartItem);
   },
 
   deleteCartItem(id: string): void {

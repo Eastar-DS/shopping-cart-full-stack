@@ -1,14 +1,10 @@
 import {CartItem} from './CartItem.js';
 import {CartItems} from './CartItems.js';
-import {Product} from './Product.js';
 
 const createCartItems = () => {
-  const product1 = new Product('1', '상품1', 1000, '/image1.png');
-  const product2 = new Product('2', '상품2', 2000, '/image2.png');
-
   return new CartItems([
-    new CartItem('1', product1, 1),
-    new CartItem('2', product2, 2),
+    new CartItem('1', '1', 1),
+    new CartItem('2', '2', 2),
   ]);
 };
 

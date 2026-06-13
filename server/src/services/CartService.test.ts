@@ -27,12 +27,12 @@ describe("cartService", () => {
     const updated = cartService.updateQuantity("1", { quantity: 3 });
 
     expect(updated.id).toBe("1");
-    expect(updated.getQuantity()).toBe(3);
+    expect(updated.quantity).toBe(3);
     expect(
       cartService
         .getCartItems()
         .find((item) => item.id === "1")
-        ?.getQuantity(),
+        ?.quantity,
     ).toBe(3);
   });
 
