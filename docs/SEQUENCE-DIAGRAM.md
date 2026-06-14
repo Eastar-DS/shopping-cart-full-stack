@@ -56,7 +56,7 @@ participant DB as DB (Supabase / products / cart_items / coupons)
         BE->>DB: cart_items JOIN products + SELECT coupons
         DB-->>BE: price, quantity, coupons
 
-        Note over BE: manual(최대 2개) / 정액→정율 순서<br/>배송비: 도서산간 +3,000 (FREESHIPPING이면 면제)
+        Note over BE: manual(최대 2개) / 정액→정율 순서<br/>배송비: 10만↑이면 무료(도서산간 포함), 10만 미만+도서산간이면 +3,000<br/>(FREESHIPPING이면 항상 면제)
 
         BE-->>FE: 200 { orderAmount, couponDiscount, deliveryFee, totalPrice, appliedCoupons: [...] }
         Note over FE: 서버 응답값(appliedCoupons·금액) 그대로 표시<br/>(클라이언트 재계산 금지 — SSOT)

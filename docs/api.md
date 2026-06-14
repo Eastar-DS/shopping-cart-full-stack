@@ -281,27 +281,61 @@ Request fields
 | `coupons`         | `string[]` | 예   | 쿠폰 id 배열 (빈 배열 허용). manual 모드는 최대 2개, auto 모드는 제한 없음 |
 | `isRemoteArea`    | `boolean`  | 예   | 제주 및 도서산간 지역 여부                                                 |
 
-Request example (manual, 쿠폰 1개 + 도서산간)
+Response `200` — 계산된 주문 금액 정보를 반환합니다.
+
+**예시 1 — 도서산간 체크 + 주문금액 10만 이상 (배송비 무료)**
+
+Request
 
 ```json
 {
-  "selectedItemIds": ["1", "2", "3"],
+  "selectedItemIds": ["1", "2"],
   "coupons": ["1"],
   "isRemoteArea": true
 }
 ```
 
-Response `200` — 계산된 주문 금액 정보를 반환합니다.
+Response
 
 ```json
 {
   "orderAmount": 150000,
   "couponDiscount": 5000,
-  "deliveryFee": 3000,
-  "totalPrice": 148000,
+  "deliveryFee": 0,
+  "totalPrice": 145000,
   "appliedCoupons": ["1"]
 }
 ```
+
+> 주문금액 150,000원 ≥ 100,000 → **도서산간이어도 배송비 무료(0)**.
+> FIXED5000 −5,000. 총액 = 150000 − 5000 + 0 = 145000.
+
+**예시 2 — 도서산간 체크 + 주문금액 10만 미만 (배송비 6,000)**
+
+Request
+
+```json
+{
+  "selectedItemIds": ["3"],
+  "coupons": [],
+  "isRemoteArea": true
+}
+```
+
+Response
+
+```json
+{
+  "orderAmount": 80000,
+  "couponDiscount": 0,
+  "deliveryFee": 6000,
+  "totalPrice": 86000,
+  "appliedCoupons": []
+}
+```
+
+> 주문금액 80,000원 < 100,000 → 기본 3,000 + 도서산간 3,000 = 6,000.
+> 총액 = 80000 − 0 + 6000 = 86000.
 
 Response fields
 

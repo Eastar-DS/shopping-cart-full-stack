@@ -214,9 +214,8 @@ appliedCoupons: [...], // 적용된 쿠폰 id 배열
     - MIRACLESALE: 오전 4시~7시에만 전체 주문금액 30% 할인
     - 최대 2개 쿠폰 조합 중 할인 효과가 가장 큰 조합 선택
   - 배송비(deliveryFee) 계산
-    - 주문금액(쿠폰 적용 전) ≥ 100,000원이면 무료
-    - 주문금액 < 100,000원이면 3,000원
-    - isRemoteArea = true이면 3,000원 추가
+    - 주문금액(쿠폰 적용 전) ≥ 100,000원이면 도서산간 포함 전액 무료
+    - 10만 미만이면 기본 3,000원, isRemoteArea = true이면 +3,000원 (합 6,000원)
     - FREESHIPPING 쿠폰 적용 시 도서산간 추가 배송비 포함 전액 무료
   - 총결제금액(totalPrice) = orderAmount - couponDiscount + deliveryFee
   - 적용된 쿠폰 id 배열(appliedCoupons) 반환
@@ -255,9 +254,9 @@ appliedCoupons: [...], // 적용된 쿠폰 id 배열
 
 **배송비 정책**
 
-- 주문금액(쿠폰 적용 *전*) ≥ 100,000원이면 무료, 아니면 3,000원.
-- isRemoteArea = true이면 3,000원 추가.
-- FREESHIPPING 적용 시 도서산간 추가분까지 무료 처리.
+- 주문금액(쿠폰 적용 *전*) ≥ 100,000원이면 **도서산간이어도 전액 무료**.
+- 10만 미만이면 기본 3,000원, isRemoteArea = true이면 +3,000원 (합 6,000원).
+- FREESHIPPING 적용 시(10만 미만이어도) 도서산간 추가분까지 무료 처리.
 
 ---
 
