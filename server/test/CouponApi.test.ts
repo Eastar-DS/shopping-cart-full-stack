@@ -28,6 +28,9 @@ const loadAppWithCouponServiceError = async () => {
         throw new Error("coupon service error");
       },
     },
+    orderService: {
+      previewOrder: jest.fn(),
+    },
   }));
 
   const { default: app } = await import("../src/app.js");

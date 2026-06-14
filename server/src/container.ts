@@ -9,6 +9,7 @@ import { SupabaseCouponRepository } from "./repositories/supabase/SupabaseCoupon
 import { SupabaseProductRepository } from "./repositories/supabase/SupabaseProductRepository.js";
 import { createCartService } from "./services/CartService.js";
 import { createCouponService } from "./services/CouponService.js";
+import { createOrderService } from "./services/OrderService.js";
 import { createProductService } from "./services/ProductService.js";
 
 const resolveDataSource = (): "supabase" | "memory" => {
@@ -49,6 +50,12 @@ export const cartService = createCartService({
 });
 
 export const couponService = createCouponService({ couponRepository });
+
+export const orderService = createOrderService({
+  cartItemRepository,
+  productRepository,
+  couponRepository,
+});
 
 if (process.env.NODE_ENV !== "test") {
   console.log(`[container] data source: ${dataSource}`);

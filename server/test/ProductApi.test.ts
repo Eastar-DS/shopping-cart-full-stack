@@ -28,6 +28,9 @@ const loadAppWithProductServiceError = async () => {
     couponService: {
       getCoupons: jest.fn(),
     },
+    orderService: {
+      previewOrder: jest.fn(),
+    },
   }));
 
   const { default: app } = await import("../src/app.js");
