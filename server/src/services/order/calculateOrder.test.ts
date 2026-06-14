@@ -55,7 +55,7 @@ describe('calculateOrder', () => {
       expect(result.deliveryFee).toBe(0);
     });
 
-    test('도서산간이면 배송비 3,000원 추가', () => {
+    test('주문금액 10만 미만 + 도서산간이면 배송비 6,000원 (3,000 + 3,000)', () => {
       const result = calculateOrder({
         items: [item(2000, 1)],
         candidateCoupons: [],
@@ -64,6 +64,17 @@ describe('calculateOrder', () => {
       });
 
       expect(result.deliveryFee).toBe(6000);
+    });
+
+    test('주문금액 10만 이상이면 도서산간이어도 배송비 무료', () => {
+      const result = calculateOrder({
+        items: [item(100000, 1)],
+        candidateCoupons: [],
+        isRemoteArea: true,
+        now: noon,
+      });
+
+      expect(result.deliveryFee).toBe(0);
     });
   });
 

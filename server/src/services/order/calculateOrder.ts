@@ -32,11 +32,14 @@ export interface OrderCalculationResult {
 const sumOrderAmount = (items: OrderLineItem[]): number =>
   items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-// 배송비: 주문금액(쿠폰 적용 전) 10만 이상이면 무료, 도서산간이면 3,000원 추가
+// 배송비: 주문금액(쿠폰 적용 전) 10만 이상이면 도서산간이어도 전액 무료.
+// 10만 미만일 때만 기본 3,000원 + 도서산간 3,000원 추가.
 const baseDeliveryFee = (orderAmount: number, isRemoteArea: boolean): number => {
-  const base = orderAmount >= FREE_SHIPPING_THRESHOLD ? 0 : BASE_SHIPPING_FEE;
-  const remote = isRemoteArea ? REMOTE_AREA_SURCHARGE : 0;
-  return base + remote;
+  if (orderAmount >= FREE_SHIPPING_THRESHOLD) {
+    return 0;
+  }
+
+  return BASE_SHIPPING_FEE + (isRemoteArea ? REMOTE_AREA_SURCHARGE : 0);
 };
 
 interface ComboResult {
