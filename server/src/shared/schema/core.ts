@@ -10,3 +10,5 @@ export type ParseResult<T> =
 export abstract class ZodType<T> {
   abstract safeParse(input: unknown): ParseResult<T>;
 }
+
+export type Infer<S> = S extends ZodType<infer T> ? T : never;

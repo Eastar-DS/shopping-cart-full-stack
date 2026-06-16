@@ -1,13 +1,17 @@
-import { ZodType, type Issue, type ParseResult } from "./core.js";
+import { ZodType, type Infer, type Issue, type ParseResult } from "./core.js";
 
 export type ZodShape = Record<string, ZodType<unknown>>;
 
-export class ZodObject extends ZodType<Record<string, unknown>> {
-  constructor(private readonly shape: ZodShape) {
+export type InferShape<Shape extends ZodShape> = {
+  [K in keyof Shape]: Infer<Shape[K]>;
+};
+
+export class ZodObject<Shape extends ZodShape> extends ZodType<InferShape<Shape>> {
+  constructor(private readonly shape: Shape) {
     super();
   }
 
-  safeParse(input: unknown): ParseResult<Record<string, unknown>> {
+  safeParse(input: unknown): ParseResult<InferShape<Shape>> {
     if (typeof input !== "object" || input === null || Array.isArray(input)) {
       return {
         success: false,
@@ -34,6 +38,6 @@ export class ZodObject extends ZodType<Record<string, unknown>> {
       return { success: false, error: { issues } };
     }
 
-    return { success: true, data };
+    return { success: true, data: data as InferShape<Shape> };
   }
 }
