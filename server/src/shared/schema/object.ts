@@ -6,9 +6,20 @@ export type InferShape<Shape extends ZodShape> = {
   [K in keyof Shape]: Infer<Shape[K]>;
 };
 
-export class ZodObject<Shape extends ZodShape> extends ZodType<InferShape<Shape>> {
-  constructor(private readonly shape: Shape) {
+type UnknownKeys = "strip" | "strict";
+
+export class ZodObject<Shape extends ZodShape> extends ZodType<
+  InferShape<Shape>
+> {
+  constructor(
+    private readonly shape: Shape,
+    private readonly unknownKeys: UnknownKeys = "strip",
+  ) {
     super();
+  }
+
+  strict(): ZodObject<Shape> {
+    return new ZodObject(this.shape, "strict");
   }
 
   safeParse(input: unknown): ParseResult<InferShape<Shape>> {
@@ -30,6 +41,15 @@ export class ZodObject<Shape extends ZodShape> extends ZodType<InferShape<Shape>
       } else {
         for (const issue of result.error.issues) {
           issues.push({ path: [key, ...issue.path], message: issue.message });
+        }
+      }
+    }
+
+    if (this.unknownKeys === "strict") {
+      const known = new Set(Object.keys(this.shape));
+      for (const key of Object.keys(record)) {
+        if (!known.has(key)) {
+          issues.push({ path: [key], message: "알 수 없는 키입니다" });
         }
       }
     }
