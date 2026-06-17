@@ -1,4 +1,5 @@
 import { InvalidInputError, NotFoundError } from "../errors/HttpError.js";
+import { z } from "../shared/schema/index.js";
 import type { CartItemRepository } from "../repositories/CartItemRepository.js";
 import type { CouponRepository } from "../repositories/CouponRepository.js";
 import type { ProductRepository } from "../repositories/ProductRepository.js";
@@ -9,37 +10,24 @@ const MAX_COUPONS_MANUAL = 2;
 
 export type OrderPreviewMode = "auto" | "manual";
 
-interface ParsedOrderPreview {
-  selectedItemIds: string[];
-  coupons: string[];
-  isRemoteArea: boolean;
-}
+const orderPreviewBodySchema = z.object({
+  selectedItemIds: z.array(z.string()),
+  coupons: z.array(z.string()),
+  isRemoteArea: z.boolean(),
+});
 
-const isStringOrNumber = (value: unknown): value is string | number =>
-  typeof value === "string" || typeof value === "number";
-
-const isIdArray = (value: unknown): value is Array<string | number> =>
-  Array.isArray(value) && value.every(isStringOrNumber);
-
-const toStringIds = (ids: Array<string | number>): string[] => ids.map((id) => `${id}`);
+type ParsedOrderPreview = z.infer<typeof orderPreviewBodySchema>;
 
 const parseRequest = (body: unknown, mode: OrderPreviewMode): ParsedOrderPreview => {
-  if (typeof body !== "object" || body === null) {
+  const result = orderPreviewBodySchema.safeParse(body);
+  if (!result.success) {
     throw new InvalidInputError();
   }
 
-  const { selectedItemIds, coupons, isRemoteArea } = body as Record<string, unknown>;
+  const { selectedItemIds, coupons, isRemoteArea } = result.data;
 
-  // 선택 상품은 1개 이상이어야 한다
-  if (!isIdArray(selectedItemIds) || selectedItemIds.length === 0) {
-    throw new InvalidInputError();
-  }
-
-  if (!isIdArray(coupons)) {
-    throw new InvalidInputError();
-  }
-
-  if (typeof isRemoteArea !== "boolean") {
+  // 선택 상품은 1개 이상이어야 한다 (배열 길이 체크는 스키마 밖에서)
+  if (selectedItemIds.length === 0) {
     throw new InvalidInputError();
   }
 
@@ -48,11 +36,7 @@ const parseRequest = (body: unknown, mode: OrderPreviewMode): ParsedOrderPreview
     throw new InvalidInputError();
   }
 
-  return {
-    selectedItemIds: toStringIds(selectedItemIds),
-    coupons: toStringIds(coupons),
-    isRemoteArea,
-  };
+  return { selectedItemIds, coupons, isRemoteArea };
 };
 
 export interface OrderServiceDeps {
