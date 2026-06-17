@@ -11,11 +11,13 @@ type UnknownKeys = "strip" | "strict";
 export class ZodObject<Shape extends ZodShape> extends ZodType<
   InferShape<Shape>
 > {
-  constructor(
-    private readonly shape: Shape,
-    private readonly unknownKeys: UnknownKeys = "strip",
-  ) {
+  private readonly shape: Shape;
+  private readonly unknownKeys: UnknownKeys;
+
+  constructor(shape: Shape, unknownKeys: UnknownKeys = "strip") {
     super();
+    this.shape = shape;
+    this.unknownKeys = unknownKeys;
   }
 
   strict(): ZodObject<Shape> {

@@ -30,8 +30,11 @@ export abstract class ZodType<T> {
 export type Infer<S> = S extends ZodType<infer T> ? T : never;
 
 export class ZodOptional<T> extends ZodType<T | undefined> {
-  constructor(private readonly inner: ZodType<T>) {
+  private readonly inner: ZodType<T>;
+
+  constructor(inner: ZodType<T>) {
     super();
+    this.inner = inner;
   }
 
   safeParse(input: unknown): ParseResult<T | undefined> {
@@ -44,8 +47,11 @@ export class ZodOptional<T> extends ZodType<T | undefined> {
 }
 
 export class ZodNullable<T> extends ZodType<T | null> {
-  constructor(private readonly inner: ZodType<T>) {
+  private readonly inner: ZodType<T>;
+
+  constructor(inner: ZodType<T>) {
     super();
+    this.inner = inner;
   }
 
   safeParse(input: unknown): ParseResult<T | null> {
@@ -58,11 +64,13 @@ export class ZodNullable<T> extends ZodType<T | null> {
 }
 
 export class ZodDefault<T> extends ZodType<T> {
-  constructor(
-    private readonly inner: ZodType<T>,
-    private readonly defaultValue: T,
-  ) {
+  private readonly inner: ZodType<T>;
+  private readonly defaultValue: T;
+
+  constructor(inner: ZodType<T>, defaultValue: T) {
     super();
+    this.inner = inner;
+    this.defaultValue = defaultValue;
   }
 
   safeParse(input: unknown): ParseResult<T> {
@@ -75,11 +83,13 @@ export class ZodDefault<T> extends ZodType<T> {
 }
 
 export class ZodCatch<T> extends ZodType<T> {
-  constructor(
-    private readonly inner: ZodType<T>,
-    private readonly catchValue: T,
-  ) {
+  private readonly inner: ZodType<T>;
+  private readonly catchValue: T;
+
+  constructor(inner: ZodType<T>, catchValue: T) {
     super();
+    this.inner = inner;
+    this.catchValue = catchValue;
   }
 
   safeParse(input: unknown): ParseResult<T> {

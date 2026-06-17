@@ -1,8 +1,11 @@
 import { ZodType, type Infer, type Issue, type ParseResult } from "./core.js";
 
 export class ZodArray<Element extends ZodType<unknown>> extends ZodType<Infer<Element>[]> {
-  constructor(private readonly element: Element) {
+  private readonly element: Element;
+
+  constructor(element: Element) {
     super();
+    this.element = element;
   }
 
   safeParse(input: unknown): ParseResult<Infer<Element>[]> {
