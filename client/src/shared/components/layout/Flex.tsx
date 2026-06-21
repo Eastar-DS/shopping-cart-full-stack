@@ -11,6 +11,7 @@ export interface FlexProps {
   flex?: CSSProperties["flex"];
   children?: ReactNode;
   className?: string;
+  style?: CSSProperties;
 }
 
 export function Flex({
@@ -23,6 +24,7 @@ export function Flex({
   flex,
   children,
   className,
+  style,
 }: FlexProps) {
   return (
     <StyledFlex
@@ -34,6 +36,7 @@ export function Flex({
       $wrap={wrap}
       $flex={flex}
       className={className}
+      style={style}
     >
       {children}
     </StyledFlex>
