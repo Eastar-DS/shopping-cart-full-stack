@@ -34,15 +34,8 @@ export function CartSection() {
   const shippingFee = selectShippingFee(items, ids);
 
   const handleProceed = () => {
-    const selectedItems = items.filter((item) => ids.has(item.id));
-    const total = subtotal + shippingFee;
     const state: CheckoutState = {
-      kindsCount: selectedItems.length,
-      totalQuantity: selectedItems.reduce(
-        (sum, item) => sum + item.quantity,
-        0,
-      ),
-      total,
+      selectedItemIds: [...ids],
     };
     navigate("/checkout", { state });
   };
