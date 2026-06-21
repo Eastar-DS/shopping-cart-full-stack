@@ -9,6 +9,7 @@ export const couponSchema = z.object({
   name: z.string(),
   type: z.string(),
   expirationDate: z.string(),
+  description: z.string(),
 });
 export type Coupon = z.infer<typeof couponSchema>;
 
