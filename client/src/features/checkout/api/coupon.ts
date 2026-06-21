@@ -2,11 +2,11 @@ import { ApiError, apiRequest } from "../../../shared/api/httpClient";
 import { z } from "../../../shared/schema";
 import { couponSchema, type Coupon } from "../types";
 
-const couponListSchma = z.array(couponSchema);
+const couponListSchema = z.array(couponSchema);
 
 export async function getCoupons(): Promise<Coupon[]> {
   const data = await apiRequest("/coupons");
-  const result = couponListSchma.safeParse(data);
+  const result = couponListSchema.safeParse(data);
   if (!result.success) {
     throw new ApiError(
       500,
