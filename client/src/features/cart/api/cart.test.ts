@@ -24,10 +24,11 @@ describe("getCart", () => {
       ),
     );
 
-    await getCart().catch((e) => {
-      expect(e).toBeInstanceOf(ApiError);
-      expect(e.code).toBe("InternalServerError");
-      expect(e.status).toBe(500);
+    await expect(getCart()).rejects.toMatchObject({
+      name: "ApiError",
+      code: "InternalServerError",
+      status: 500,
     });
+    await expect(getCart()).rejects.toBeInstanceOf(ApiError);
   });
 });

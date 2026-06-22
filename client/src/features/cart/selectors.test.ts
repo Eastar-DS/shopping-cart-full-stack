@@ -40,7 +40,7 @@ describe("selectSubtotal", () => {
 
 describe("selectShippingFee — 임계값", () => {
   test.each([
-    [0, SHIPPING_FEE],
+    [1, SHIPPING_FEE],
     [99_999, SHIPPING_FEE],
     [FREE_SHIPPING_THRESHOLD, 0],
     [200_000, 0],
@@ -48,6 +48,12 @@ describe("selectShippingFee — 임계값", () => {
     expect(selectShippingFee([mkItem("1", price, 1)], new Set(["1"]))).toBe(
       expected,
     );
+  });
+
+  test("선택 항목이 없으면 배송비 0", () => {
+    expect(
+      selectShippingFee([mkItem("1", 1000, 1)], new Set()),
+    ).toBe(0);
   });
 });
 

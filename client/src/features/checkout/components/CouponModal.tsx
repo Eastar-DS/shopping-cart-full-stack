@@ -1,0 +1,106 @@
+import { useEffect, useState } from "react";
+import styled from "@emotion/styled";
+import type { Coupon } from "../types";
+import { Modal } from "../../../shared/components/Modal";
+import { Row, Stack } from "../../../shared/components/layout";
+import { CouponItem } from "./CouponItem";
+import { Button } from "../../../shared/components/Button";
+import { InfoOutlineIcon } from "../../../assets/icons/InfoOutlineIcon";
+import { colors } from "../../../shared/styles/tokens";
+
+const MAX_COUPONS = 2;
+
+interface CouponModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  coupons: Coupon[];
+  appliedCouponIds: string[];
+  onApply: (couponIds: string[]) => void;
+  previewDiscount: (couponIds: string[]) => Promise<number | null>;
+}
+
+export function CouponModal({
+  isOpen,
+  onClose,
+  coupons,
+  appliedCouponIds,
+  onApply,
+  previewDiscount,
+}: CouponModalProps) {
+  const [draft, setDraft] = useState<Set<string>>(
+    () => new Set(appliedCouponIds),
+  );
+  const [discount, setDiscount] = useState(0);
+
+  useEffect(() => {
+    if (isOpen) setDraft(new Set(appliedCouponIds));
+  }, [isOpen, appliedCouponIds]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    void previewDiscount([...draft]).then((next) => {
+      if (!cancelled && next !== null) setDiscount(next);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, draft, previewDiscount]);
+
+  const toggle = (id: string) => {
+    setDraft((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else if (next.size < MAX_COUPONS) {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handleApply = () => {
+    onApply([...draft]);
+    onClose();
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} ariaLabel="쿠폰을 선택해 주세요">
+      <Modal.Header>쿠폰을 선택해 주세요</Modal.Header>
+      <Modal.Body>
+        <Stack gap={16}>
+          <Row align="center" gap={4}>
+            <InfoOutlineIcon color={colors.textPrimary} />
+            <NoticeText>쿠폰은 최대 2개까지 사용할 수 있습니다.</NoticeText>
+          </Row>
+          <Stack as="ul" style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            {coupons.map((coupon) => {
+            const checked = draft.has(coupon.id);
+            const disabled = !checked && draft.size >= MAX_COUPONS;
+            return (
+              <li key={coupon.id}>
+                <CouponItem
+                  coupon={coupon}
+                  checked={checked}
+                  disabled={disabled}
+                  onToggle={() => toggle(coupon.id)}
+                />
+                </li>
+              );
+            })}
+          </Stack>
+        </Stack>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="primary" fullWidth onClick={handleApply}>
+          총 {discount.toLocaleString()}원 할인 쿠폰 사용하기
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+}
+
+const NoticeText = styled.span`
+  font-size: 12px;
+  color: ${colors.textPrimary};
+`;

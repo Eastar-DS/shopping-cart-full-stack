@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { MemoryRouter } from "react-router-dom";
 import { server } from "../../../../test/mocks/server";
+import { queryStore } from "../../../shared/queries";
 import { CartPage } from "./CartPage";
 
 const baseUrl = "http://localhost:3000";
@@ -15,15 +16,21 @@ function renderCartPage() {
   );
 }
 
+let consoleErrorSpy: jest.SpyInstance;
+
 beforeEach(() => {
   localStorage.clear();
+  queryStore.reset();
+  consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+});
+
+afterEach(() => {
+  consoleErrorSpy.mockRestore();
 });
 
 describe("CartPage", () => {
   it("카트가 비어있으면 EmptyCart 안내가 표시된다", async () => {
-    server.use(
-      http.get(`${baseUrl}/carts`, () => HttpResponse.json([])),
-    );
+    server.use(http.get(`${baseUrl}/carts`, () => HttpResponse.json([])));
 
     renderCartPage();
 
@@ -32,7 +39,7 @@ describe("CartPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("API 가 실패하면 재시도 버튼이 노출되고, 클릭 시 다시 요청한다", async () => {
+  it("API 가 실패하면 ErrorFallback 의 재시도 버튼이 노출되고, 클릭 시 다시 요청한다", async () => {
     let calls = 0;
     server.use(
       http.get(`${baseUrl}/carts`, () => {

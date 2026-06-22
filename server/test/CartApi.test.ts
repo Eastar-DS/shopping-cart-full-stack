@@ -3,8 +3,7 @@ import request from "supertest";
 
 const loadApp = async () => {
   jest.resetModules();
-  jest.unstable_unmockModule("../src/services/ProductService.js");
-  jest.unstable_unmockModule("../src/services/CartService.js");
+  jest.unstable_unmockModule("../src/container.js");
 
   const { default: app } = await import("../src/app.js");
 
@@ -13,14 +12,24 @@ const loadApp = async () => {
 
 const loadAppWithCartServiceError = async () => {
   jest.resetModules();
-  jest.unstable_unmockModule("../src/services/ProductService.js");
-  jest.unstable_mockModule("../src/services/CartService.js", () => ({
+  jest.unstable_mockModule("../src/container.js", () => ({
+    productService: {
+      getProducts: jest.fn(),
+      createProduct: jest.fn(),
+      deleteProduct: jest.fn(),
+    },
     cartService: {
       getCartItems() {
         throw new Error("cart service error");
       },
       updateQuantity: jest.fn(),
       deleteCartItem: jest.fn(),
+    },
+    couponService: {
+      getCoupons: jest.fn(),
+    },
+    orderService: {
+      previewOrder: jest.fn(),
     },
   }));
 
@@ -51,15 +60,19 @@ describe("Cart API", () => {
     await request(app).get("/carts").expect(500);
   });
 
-  test("PATCH /carts/:id는 수량을 변경하고 변경 결과를 응답한다", async () => {
+  test("PATCH /carts/:id는 수량을 변경하고 갱신된 장바구니 항목 전체를 응답한다", async () => {
     const app = await loadApp();
     const response = await request(app)
       .patch("/carts/1")
       .send({ quantity: 3 })
       .expect(200);
 
-    expect(response.body).toEqual({
+    expect(response.body).toMatchObject({
       id: "1",
+      product: {
+        id: "1",
+        name: "EASTER",
+      },
       quantity: 3,
     });
   });
