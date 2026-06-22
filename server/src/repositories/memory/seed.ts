@@ -18,7 +18,7 @@ export const createSeedCartItems = (): CartItem[] => [
 
 export const createSeedCoupons = (): Coupon[] => [
   new Coupon('1', '5,000원 할인 쿠폰', 'FIXED5000', '2026-11-30'),
-  new Coupon('2', '2+1 쿠폰', 'BOGO', '2026-06-30'),
-  new Coupon('3', '무료 배송 쿠폰', 'FREESHIPPING', '2026-08-31'),
-  new Coupon('4', '30% 시간제 할인 쿠폰', 'MIRACLESALE', '2026-07-31'),
+  new Coupon('2', '2개 구매 시 1개 무료 쿠폰', 'BOGO', '2026-06-30'),
+  new Coupon('3', '5만원 이상 구매 시 무료 배송 쿠폰', 'FREESHIPPING', '2026-08-31'),
+  new Coupon('4', '미라클모닝 30% 할인 쿠폰', 'MIRACLESALE', '2026-07-31'),
 ];
