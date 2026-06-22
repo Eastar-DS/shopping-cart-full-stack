@@ -13,9 +13,11 @@ export function CartItemContent({ product, children }: CartItemContentProps) {
   return (
     <Row gap={24}>
       <ProductImage src={product.imageUrl} alt={product.name} />
-      <Stack gap={4} flex={1}>
-        <ProductName>{product.name}</ProductName>
-        <Price>{product.price.toLocaleString()}원</Price>
+      <Stack flex={1} justify="space-between">
+        <Stack gap={4}>
+          <ProductName>{product.name}</ProductName>
+          <Price>{product.price.toLocaleString()}원</Price>
+        </Stack>
         {children}
       </Stack>
     </Row>
