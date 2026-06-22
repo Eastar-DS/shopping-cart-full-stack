@@ -97,6 +97,7 @@ export const conditionTextOf = (type: CouponType): string => {
     case "MIRACLESALE":
       return `사용 가능 시간 오전 ${MIRACLESALE_START_HOUR}시~${MIRACLESALE_END_HOUR}시`;
     case "BOGO":
-      return `동일 상품 ${BOGO_MIN_QUANTITY}개 이상 구매 시`;
+      // 이름("2개 구매 시 1개 무료 쿠폰")이 조건을 이미 담아 별도 안내줄 생략
+      return "";
   }
 };

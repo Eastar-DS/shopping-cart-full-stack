@@ -29,7 +29,7 @@ export function CouponItem({
         />
         <Stack gap={4}>
           <Detail>만료일: {formatYmd(coupon.expirationDate)}</Detail>
-          <Detail>{coupon.description}</Detail>
+          {coupon.description && <Detail>{coupon.description}</Detail>}
         </Stack>
       </Stack>
     </Item>
