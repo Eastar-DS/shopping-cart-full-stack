@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import styled from "@emotion/styled";
 import type { Coupon } from "../types";
 import { Modal } from "../../../shared/components/Modal";
-import { Stack } from "../../../shared/components/layout";
+import { Row, Stack } from "../../../shared/components/layout";
 import { CouponItem } from "./CouponItem";
 import { Button } from "../../../shared/components/Button";
+import { InfoOutlineIcon } from "../../../assets/icons/InfoOutlineIcon";
+import { colors } from "../../../shared/styles/tokens";
 
 const MAX_COUPONS = 2;
 
@@ -65,8 +68,13 @@ export function CouponModal({
     <Modal isOpen={isOpen} onClose={onClose} ariaLabel="쿠폰을 선택해 주세요">
       <Modal.Header>쿠폰을 선택해 주세요</Modal.Header>
       <Modal.Body>
-        <Stack as="ul" style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {coupons.map((coupon) => {
+        <Stack gap={16}>
+          <Row align="center" gap={4}>
+            <InfoOutlineIcon color={colors.textPrimary} />
+            <NoticeText>쿠폰은 최대 2개까지 사용할 수 있습니다.</NoticeText>
+          </Row>
+          <Stack as="ul" style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            {coupons.map((coupon) => {
             const checked = draft.has(coupon.id);
             const disabled = !checked && draft.size >= MAX_COUPONS;
             return (
@@ -77,9 +85,10 @@ export function CouponModal({
                   disabled={disabled}
                   onToggle={() => toggle(coupon.id)}
                 />
-              </li>
-            );
-          })}
+                </li>
+              );
+            })}
+          </Stack>
         </Stack>
       </Modal.Body>
       <Modal.Footer>
@@ -90,3 +99,8 @@ export function CouponModal({
     </Modal>
   );
 }
+
+const NoticeText = styled.span`
+  font-size: 12px;
+  color: ${colors.textPrimary};
+`;
