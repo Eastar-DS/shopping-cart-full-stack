@@ -13,6 +13,8 @@ import { Checkbox } from "../../../shared/components/CheckBox";
 import { CouponModal } from "../components/CouponModal";
 import { InfoOutlineIcon } from "../../../assets/icons/InfoOutlineIcon";
 import { FREE_SHIPPING_THRESHOLD } from "../../cart/selectors";
+import { useNavigate } from "react-router-dom";
+import type { PaymentConfirmState } from "../types";
 
 export function CheckoutSection({
   selectedItemIds,
@@ -71,6 +73,17 @@ export function CheckoutSection({
     (sum, item) => sum + item.quantity,
     0,
   );
+
+  const navigate = useNavigate();
+  const handlePay = () => {
+    if (!preview) return;
+    const state: PaymentConfirmState = {
+      kindsCount: selectedItems.length,
+      totalQuantity,
+      totalPrice: preview.totalPrice,
+    };
+    navigate("/payment-confirm", { state });
+  };
 
   return (
     <Stack gap={24}>
@@ -134,7 +147,12 @@ export function CheckoutSection({
         </>
       )}
 
-      <Button variant="primary" fullWidth disabled={!preview || isLoading}>
+      <Button
+        variant="primary"
+        fullWidth
+        disabled={!preview || isLoading}
+        onClick={handlePay}
+      >
         결제하기
       </Button>
 

@@ -4,6 +4,13 @@ export interface CheckoutState {
   selectedItemIds: string[];
 }
 
+/** 주문 확인 → 결제 확인 으로 넘기는 최종 표시값 (서버가 계산한 스냅샷) */
+export interface PaymentConfirmState {
+  kindsCount: number;
+  totalQuantity: number;
+  totalPrice: number;
+}
+
 export const couponSchema = z.object({
   id: z.string(),
   name: z.string(),
