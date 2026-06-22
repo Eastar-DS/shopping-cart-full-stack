@@ -11,6 +11,8 @@ import { CheckoutItemRow } from "../components/CheckoutItemRow";
 import { Button } from "../../../shared/components/Button";
 import { Checkbox } from "../../../shared/components/CheckBox";
 import { CouponModal } from "../components/CouponModal";
+import { InfoOutlineIcon } from "../../../assets/icons/InfoOutlineIcon";
+import { FREE_SHIPPING_THRESHOLD } from "../../cart/selectors";
 
 export function CheckoutSection({
   selectedItemIds,
@@ -97,6 +99,12 @@ export function CheckoutSection({
       />
 
       {preview && (
+        <>
+        <Hint>
+          <InfoOutlineIcon width={12} height={12} />
+          총 주문 금액이 {FREE_SHIPPING_THRESHOLD.toLocaleString()}원 이상일 경우
+          무료 배송됩니다.
+        </Hint>
         <SummarySection>
           <Row justify="space-between" align="center">
             <SummaryLabel>주문 금액</SummaryLabel>
@@ -123,6 +131,7 @@ export function CheckoutSection({
             </SummaryAmount>
           </TotalRow>
         </SummarySection>
+        </>
       )}
 
       <Button variant="primary" fullWidth disabled={!preview || isLoading}>
@@ -175,5 +184,13 @@ const SummaryAmount = styled.span`
   font-family: "Noto Sans KR", sans-serif;
   font-size: 24px;
   font-weight: 700;
+  color: ${colors.textPrimary};
+`;
+const Hint = styled.p`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  font-size: 12px;
   color: ${colors.textPrimary};
 `;
