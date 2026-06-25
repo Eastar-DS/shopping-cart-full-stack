@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useCartQuery } from "../../cart/hooks/useCartQuery";
 import { useCouponsQuery } from "../hooks/useCouponsQuery";
 import { useModal } from "../../../shared/components/Modal";
 import { useOrderPreview } from "../hooks/useOrderPreview";
-import { postOrderPreview } from "../api/order";
 import { Row, Stack } from "../../../shared/components/layout";
 import styled from "@emotion/styled";
 import { colors } from "../../../shared/styles/tokens";
@@ -58,17 +57,6 @@ export function CheckoutSection({
     void refresh(appliedCouponIds, next, "manual");
   };
 
-  const previewDiscount = useCallback(
-    (couponIds: string[]) =>
-      postOrderPreview(
-        { selectedItemIds, coupons: couponIds, isRemoteArea },
-        "manual",
-      )
-        .then((result) => result.couponDiscount)
-        .catch(() => null),
-    [selectedItemIds, isRemoteArea],
-  );
-
   const totalQuantity = selectedItems.reduce(
     (sum, item) => sum + item.quantity,
     0,
@@ -113,37 +101,37 @@ export function CheckoutSection({
 
       {preview && (
         <>
-        <Hint>
-          <InfoOutlineIcon width={12} height={12} />
-          총 주문 금액이 {FREE_SHIPPING_THRESHOLD.toLocaleString()}원 이상일 경우
-          무료 배송됩니다.
-        </Hint>
-        <SummarySection>
-          <Row justify="space-between" align="center">
-            <SummaryLabel>주문 금액</SummaryLabel>
-            <SummaryAmount>
-              {preview.orderAmount.toLocaleString()}원
-            </SummaryAmount>
-          </Row>
-          <Row justify="space-between" align="center">
-            <SummaryLabel>쿠폰 할인 금액</SummaryLabel>
-            <SummaryAmount>
-              -{preview.couponDiscount.toLocaleString()}원
-            </SummaryAmount>
-          </Row>
-          <Row justify="space-between" align="center">
-            <SummaryLabel>배송비</SummaryLabel>
-            <SummaryAmount>
-              {preview.deliveryFee.toLocaleString()}원
-            </SummaryAmount>
-          </Row>
-          <TotalRow justify="space-between" align="center">
-            <SummaryLabel>총 결제 금액</SummaryLabel>
-            <SummaryAmount>
-              {preview.totalPrice.toLocaleString()}원
-            </SummaryAmount>
-          </TotalRow>
-        </SummarySection>
+          <Hint>
+            <InfoOutlineIcon width={12} height={12} />총 주문 금액이{" "}
+            {FREE_SHIPPING_THRESHOLD.toLocaleString()}원 이상일 경우 무료
+            배송됩니다.
+          </Hint>
+          <SummarySection>
+            <Row justify="space-between" align="center">
+              <SummaryLabel>주문 금액</SummaryLabel>
+              <SummaryAmount>
+                {preview.orderAmount.toLocaleString()}원
+              </SummaryAmount>
+            </Row>
+            <Row justify="space-between" align="center">
+              <SummaryLabel>쿠폰 할인 금액</SummaryLabel>
+              <SummaryAmount>
+                -{preview.couponDiscount.toLocaleString()}원
+              </SummaryAmount>
+            </Row>
+            <Row justify="space-between" align="center">
+              <SummaryLabel>배송비</SummaryLabel>
+              <SummaryAmount>
+                {preview.deliveryFee.toLocaleString()}원
+              </SummaryAmount>
+            </Row>
+            <TotalRow justify="space-between" align="center">
+              <SummaryLabel>총 결제 금액</SummaryLabel>
+              <SummaryAmount>
+                {preview.totalPrice.toLocaleString()}원
+              </SummaryAmount>
+            </TotalRow>
+          </SummarySection>
         </>
       )}
 
@@ -162,7 +150,8 @@ export function CheckoutSection({
         coupons={coupons}
         appliedCouponIds={appliedCouponIds}
         onApply={handleApplyCoupons}
-        previewDiscount={previewDiscount}
+        selectedItemIds={selectedItemIds}
+        isRemoteArea={isRemoteArea}
       />
     </Stack>
   );

@@ -7,6 +7,7 @@ import { CouponItem } from "./CouponItem";
 import { Button } from "../../../shared/components/Button";
 import { InfoOutlineIcon } from "../../../assets/icons/InfoOutlineIcon";
 import { colors } from "../../../shared/styles/tokens";
+import { useOrderPreview } from "../hooks/useOrderPreview";
 
 const MAX_COUPONS = 2;
 
@@ -16,7 +17,8 @@ interface CouponModalProps {
   coupons: Coupon[];
   appliedCouponIds: string[];
   onApply: (couponIds: string[]) => void;
-  previewDiscount: (couponIds: string[]) => Promise<number | null>;
+  selectedItemIds: string[];
+  isRemoteArea: boolean;
 }
 
 export function CouponModal({
@@ -25,12 +27,14 @@ export function CouponModal({
   coupons,
   appliedCouponIds,
   onApply,
-  previewDiscount,
+  selectedItemIds,
+  isRemoteArea,
 }: CouponModalProps) {
   const [draft, setDraft] = useState<Set<string>>(
     () => new Set(appliedCouponIds),
   );
-  const [discount, setDiscount] = useState(0);
+  const { preview, isLoading, error, refresh } =
+    useOrderPreview(selectedItemIds);
 
   useEffect(() => {
     if (isOpen) setDraft(new Set(appliedCouponIds));
@@ -38,14 +42,9 @@ export function CouponModal({
 
   useEffect(() => {
     if (!isOpen) return;
-    let cancelled = false;
-    void previewDiscount([...draft]).then((next) => {
-      if (!cancelled && next !== null) setDiscount(next);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [isOpen, draft, previewDiscount]);
+
+    void refresh([...draft], isRemoteArea, "manual");
+  }, [isOpen, draft, isRemoteArea, refresh]);
 
   const toggle = (id: string) => {
     setDraft((prev) => {
@@ -64,6 +63,9 @@ export function CouponModal({
     onClose();
   };
 
+  const discount = preview?.couponDiscount ?? 0;
+  const ready = !isLoading && !error && preview !== null;
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} ariaLabel="쿠폰을 선택해 주세요">
       <Modal.Header>쿠폰을 선택해 주세요</Modal.Header>
@@ -75,16 +77,16 @@ export function CouponModal({
           </Row>
           <Stack as="ul" style={{ listStyle: "none", padding: 0, margin: 0 }}>
             {coupons.map((coupon) => {
-            const checked = draft.has(coupon.id);
-            const disabled = !checked && draft.size >= MAX_COUPONS;
-            return (
-              <li key={coupon.id}>
-                <CouponItem
-                  coupon={coupon}
-                  checked={checked}
-                  disabled={disabled}
-                  onToggle={() => toggle(coupon.id)}
-                />
+              const checked = draft.has(coupon.id);
+              const disabled = !checked && draft.size >= MAX_COUPONS;
+              return (
+                <li key={coupon.id}>
+                  <CouponItem
+                    coupon={coupon}
+                    checked={checked}
+                    disabled={disabled}
+                    onToggle={() => toggle(coupon.id)}
+                  />
                 </li>
               );
             })}
@@ -92,8 +94,17 @@ export function CouponModal({
         </Stack>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="primary" fullWidth onClick={handleApply}>
-          총 {discount.toLocaleString()}원 할인 쿠폰 사용하기
+        <Button
+          variant="primary"
+          fullWidth
+          disabled={!ready}
+          onClick={handleApply}
+        >
+          {isLoading
+            ? "계산중"
+            : error
+              ? "쿠폰 정보를 불러오지 못했어요"
+              : `총 ${discount.toLocaleString()}원 할인 쿠폰 사용하기`}
         </Button>
       </Modal.Footer>
     </Modal>
