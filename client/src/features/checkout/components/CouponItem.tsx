@@ -23,8 +23,10 @@ export function CouponItem({
       <Stack gap={8}>
         <Checkbox
           checked={checked}
-          disabled={disabled}
-          onChange={onToggle}
+          aria-disabled={disabled || undefined}
+          onChange={() => {
+            if (!disabled) onToggle();
+          }}
           label={coupon.name}
         />
         <Stack gap={4}>
