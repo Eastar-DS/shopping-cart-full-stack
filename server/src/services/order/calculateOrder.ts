@@ -29,7 +29,7 @@ export interface OrderCalculationResult {
   appliedCoupons: string[];
 }
 
-const sumOrderAmount = (items: OrderLineItem[]): number =>
+export const sumOrderAmount = (items: OrderLineItem[]): number =>
   items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
 // 배송비: 주문금액(쿠폰 적용 전) 10만 이상이면 도서산간이어도 전액 무료.

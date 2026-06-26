@@ -3,8 +3,12 @@ import { z } from "../shared/schema/index.js";
 import type { CartItemRepository } from "../repositories/CartItemRepository.js";
 import type { CouponRepository } from "../repositories/CouponRepository.js";
 import type { ProductRepository } from "../repositories/ProductRepository.js";
-import { calculateOrder } from "./order/calculateOrder.js";
-import type { OrderLineItem } from "./order/couponPolicy.js";
+import { calculateOrder, sumOrderAmount } from "./order/calculateOrder.js";
+import {
+  inapplicableReasonOf,
+  type CouponContext,
+  type OrderLineItem,
+} from "./order/couponPolicy.js";
 
 const MAX_COUPONS_MANUAL = 2;
 
@@ -18,7 +22,10 @@ const orderPreviewBodySchema = z.object({
 
 type ParsedOrderPreview = z.infer<typeof orderPreviewBodySchema>;
 
-const parseRequest = (body: unknown, mode: OrderPreviewMode): ParsedOrderPreview => {
+const parseRequest = (
+  body: unknown,
+  mode: OrderPreviewMode,
+): ParsedOrderPreview => {
   const result = orderPreviewBodySchema.safeParse(body);
   if (!result.success) {
     throw new InvalidInputError();
@@ -51,10 +58,15 @@ export const createOrderService = ({
   couponRepository,
 }: OrderServiceDeps) => ({
   async previewOrder(body: unknown, options: { mode: OrderPreviewMode }) {
-    const { selectedItemIds, coupons, isRemoteArea } = parseRequest(body, options.mode);
+    const { selectedItemIds, coupons, isRemoteArea } = parseRequest(
+      body,
+      options.mode,
+    );
 
     const allCartItems = await cartItemRepository.findAll();
-    const cartItemById = new Map(allCartItems.map((cartItem) => [cartItem.id, cartItem]));
+    const cartItemById = new Map(
+      allCartItems.map((cartItem) => [cartItem.id, cartItem]),
+    );
 
     const selectedCartItems = selectedItemIds.map((id) => {
       const cartItem = cartItemById.get(id);
@@ -65,7 +77,9 @@ export const createOrderService = ({
     });
 
     const allProducts = await productRepository.findAll();
-    const productById = new Map(allProducts.map((product) => [product.id, product]));
+    const productById = new Map(
+      allProducts.map((product) => [product.id, product]),
+    );
 
     const items: OrderLineItem[] = selectedCartItems.map((cartItem) => {
       const product = productById.get(cartItem.productId);
@@ -90,12 +104,25 @@ export const createOrderService = ({
       return coupon;
     });
 
-    return calculateOrder({
+    const now = new Date();
+    const ctx: CouponContext = {
+      orderAmount: sumOrderAmount(items),
+      items,
+      now,
+    };
+    const couponStatuses = allCoupons.map((coupon) => {
+      const reason = inapplicableReasonOf(coupon, ctx);
+      return { id: coupon.id, applicable: reason === null, reason };
+    });
+
+    const result = calculateOrder({
       items,
       candidateCoupons,
       isRemoteArea,
-      now: new Date(),
+      now,
     });
+
+    return { ...result, couponStatuses };
   },
 });
 
