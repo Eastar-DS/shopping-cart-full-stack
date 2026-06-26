@@ -9,6 +9,7 @@ interface CouponItemProps {
   coupon: Coupon;
   checked: boolean;
   disabled?: boolean;
+  reason?: string | null;
   onToggle: () => void;
 }
 
@@ -16,6 +17,7 @@ export function CouponItem({
   coupon,
   checked,
   disabled = false,
+  reason = null,
   onToggle,
 }: CouponItemProps) {
   return (
@@ -31,7 +33,11 @@ export function CouponItem({
         />
         <Stack gap={4}>
           <Detail>만료일: {formatYmd(coupon.expirationDate)}</Detail>
-          {coupon.description && <Detail>{coupon.description}</Detail>}
+          {reason ? (
+            <Detail>사용불가({reason})</Detail>
+          ) : (
+            coupon.description && <Detail>{coupon.description}</Detail>
+          )}
         </Stack>
       </Stack>
     </Item>

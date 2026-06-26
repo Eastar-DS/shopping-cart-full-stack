@@ -65,6 +65,7 @@ export function CouponModal({
 
   const discount = preview?.couponDiscount ?? 0;
   const ready = !isLoading && !error && preview !== null;
+  const couponStatuses = preview?.couponStatuses ?? [];
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} ariaLabel="쿠폰을 선택해 주세요">
@@ -78,13 +79,17 @@ export function CouponModal({
           <Stack as="ul" style={{ listStyle: "none", padding: 0, margin: 0 }}>
             {coupons.map((coupon) => {
               const checked = draft.has(coupon.id);
-              const disabled = !checked && draft.size >= MAX_COUPONS;
+              const status = couponStatuses.find((s) => s.id === coupon.id);
+              const disabled =
+                (status !== undefined && !status.applicable) ||
+                (!checked && draft.size >= MAX_COUPONS);
               return (
                 <li key={coupon.id}>
                   <CouponItem
                     coupon={coupon}
                     checked={checked}
                     disabled={disabled}
+                    reason={status?.reason ?? null}
                     onToggle={() => toggle(coupon.id)}
                   />
                 </li>

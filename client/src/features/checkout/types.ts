@@ -26,5 +26,12 @@ export const orderPreviewSchema = z.object({
   deliveryFee: z.number(),
   totalPrice: z.number(),
   appliedCoupons: z.array(z.string()),
+  couponStatuses: z.array(
+    z.object({
+      id: z.string(),
+      applicable: z.boolean(),
+      reason: z.string().nullable(),
+    }),
+  ),
 });
 export type OrderPreview = z.infer<typeof orderPreviewSchema>;
