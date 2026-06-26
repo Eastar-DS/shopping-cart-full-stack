@@ -47,21 +47,33 @@ const bogoFreeUnitPrice = (items: OrderLineItem[]): number => {
 };
 
 export const isApplicable = (coupon: Coupon, ctx: CouponContext): boolean => {
-  if (coupon.isExpired(ctx.now)) {
-    return false;
-  }
+  return inapplicableReasonOf(coupon, ctx) === null;
+};
 
+export const inapplicableReasonOf = (
+  coupon: Coupon,
+  ctx: CouponContext,
+): string | null => {
+  if (coupon.isExpired(ctx.now)) return "만료된 쿠폰입니다";
   switch (coupon.type) {
     case "FIXED5000":
-      return ctx.orderAmount >= FIXED5000_MIN_ORDER;
-    case "BOGO":
-      return bogoFreeUnitPrice(ctx.items) > 0;
+      return ctx.orderAmount >= FIXED5000_MIN_ORDER
+        ? null
+        : `최소 주문 금액 ${FIXED5000_MIN_ORDER.toLocaleString()}원 이상`;
     case "FREESHIPPING":
-      return ctx.orderAmount >= FREESHIPPING_MIN_ORDER;
+      return ctx.orderAmount >= FREESHIPPING_MIN_ORDER
+        ? null
+        : `최소 주문 금액 ${FREESHIPPING_MIN_ORDER.toLocaleString()}원 이상`;
     case "MIRACLESALE": {
       const hour = ctx.now.getHours();
-      return hour >= MIRACLESALE_START_HOUR && hour < MIRACLESALE_END_HOUR;
+      return hour >= MIRACLESALE_START_HOUR && hour < MIRACLESALE_END_HOUR
+        ? null
+        : `오전 ${MIRACLESALE_START_HOUR}~${MIRACLESALE_END_HOUR}시에만 사용 가능`;
     }
+    case "BOGO":
+      return bogoFreeUnitPrice(ctx.items) > 0
+        ? null
+        : `동일 상품 ${BOGO_MIN_QUANTITY}개 이상 구매 시`;
   }
 };
 
